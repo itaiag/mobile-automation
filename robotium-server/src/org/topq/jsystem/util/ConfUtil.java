@@ -43,7 +43,9 @@ public class ConfUtil {
 			Log.e(TAG, "Failed to open file:/data/conf.txt" + e.getMessage());
 			e.printStackTrace();
 		}finally{
-			in.close();
+			if (null != in){
+				in.close();
+			}
 		}
 
 	}
