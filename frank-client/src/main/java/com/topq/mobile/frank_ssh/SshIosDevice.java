@@ -21,7 +21,7 @@ import com.dhemery.victor.IosDevice;
 
 /**
  * 
- * @author Bortmna Limor
+ * @author Bortman Limor
  *
  */
 public class SshIosDevice implements IosDevice{
