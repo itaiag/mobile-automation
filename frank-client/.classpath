@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="src/resources/victor-2.2.0.jar" sourcepath="src/resources/dhemery-victor-2.2.0-21-g3789fc1.jar"/>
+	<classpathentry kind="lib" path="src/resources/configuration-kit-2.0.0-sources.jar"/>
+	<classpathentry kind="lib" path="src/resources/configuration-kit-2.1.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="src/resources/configuration-kit-2.1.0.jar"/>
+	<classpathentry kind="lib" path="src/resources/gson-2.1.jar"/>
+	<classpathentry kind="lib" path="src/resources/log4j-1.2.12.jar"/>
+	<classpathentry kind="lib" path="src/resources/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="src/resources/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
