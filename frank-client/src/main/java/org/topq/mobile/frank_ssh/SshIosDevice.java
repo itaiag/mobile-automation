@@ -1,4 +1,4 @@
-package com.topq.mobile.frank_ssh;
+package org.topq.mobile.frank_ssh;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

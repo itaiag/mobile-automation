@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.topq.mobile.frank_client.interfaces.FrankClient;
+import org.topq.mobile.frank_ssh.SshIosDevice;
 
 
 import com.dhemery.configuration.Configuration;
@@ -13,7 +14,6 @@ import com.dhemery.victor.IosApplication;
 import com.dhemery.victor.IosDevice;
 import com.dhemery.victor.configuration.CreateIosApplication;
 import com.dhemery.victor.configuration.CreateIosDevice;
-import com.topq.mobile.frank_ssh.SshIosDevice;
 
 /**
  * 
