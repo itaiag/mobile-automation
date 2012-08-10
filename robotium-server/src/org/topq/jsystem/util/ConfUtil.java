@@ -10,7 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.util.Log;
-
+/**
+ * 
+ * @author Bortman Limor
+ *
+ */
 public class ConfUtil {
 
 	private  Map<String, String> confMap = null;
@@ -18,6 +22,7 @@ public class ConfUtil {
 	private static final String TAG = "ConfUtil";
 
 	private ConfUtil() throws IOException{
+		
 		confMap = new HashMap<String, String>();
 		InputStream in =null;
 		try {		
