@@ -1,5 +1,9 @@
 package org.topq.mobile.robotium_client.interfaces;
-
+/**
+ * 
+ * @author Bortman Limor
+ *
+ */
 public interface RobotiumClient {
 	public static final CharSequence ERROR_STRING = "ERROR";
 	public static final CharSequence SUCCESS_STRING = "SUCCESS";

@@ -17,7 +17,11 @@ import org.topq.mobile.robotium_client.infrastructure.AdbTcpClient;
 import org.topq.mobile.robotium_client.interfaces.RobotiumClient;
 
 import com.android.ddmlib.IDevice;
-
+/**
+ * 
+ * @author Bortman Limor
+ *
+ */
 public class RobotuimClientImpel implements RobotiumClient{
 	
 	
