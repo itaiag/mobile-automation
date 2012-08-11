@@ -42,8 +42,7 @@ public class RobotuimClientImpel implements RobotiumClient{
 		File file = new File(configFile);
 		if(file.exists()){
 		Properties pro = new Properties();
-		InputStream in;
-			in = new FileInputStream(file);
+		InputStream in = new FileInputStream(file);
 		pro.load(in);
 		String temeroryProrp = pro.getProperty("Port");
 		logger.debug("In Properties file port is:"+temeroryProrp);
