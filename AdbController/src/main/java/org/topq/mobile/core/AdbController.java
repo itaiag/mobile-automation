@@ -261,8 +261,7 @@ public class AdbController{
 
 		if (device.getState() == IDevice.DeviceState.ONLINE){
 			device.createForward(localPort, remotePort);
-		}
-		else{
+		}else{
 			Exception e = new Exception("Unable to perform port forwarding - " + deviceSerial + " is not online");
 			logger.error(e);
 			throw e;
@@ -390,13 +389,17 @@ public class AdbController{
 	 * @param device
 	 * @throws Exception
 	 */
-	public void getScreenShots(IDevice device) throws Exception {
+	public void getScreenShots(IDevice device, File screenshotFile) throws Exception {
 		logger.info("Screen Shot " + device.getSerialNumber());
 		RawImage ri = device.getScreenshot();
-		display(device.getSerialNumber(), ri);
+		display(device.getSerialNumber(), ri, screenshotFile);
+	}
+	
+	public void getScreenShots(IDevice device) throws Exception {
+		getScreenShots(device, null);
 	}
 
-	private void display(String device, RawImage rawImage) throws Exception {
+	private void display(String device, RawImage rawImage, File screenshotFile) throws Exception {
 		BufferedImage image = new BufferedImage(rawImage.width, rawImage.height, BufferedImage.TYPE_INT_RGB);
 		// Dimension size = new Dimension(image.getWidth(), image.getHeight());
 
@@ -408,11 +411,12 @@ public class AdbController{
 				image.setRGB(x, y, value);
 			}
 		}
-
-		File scFile = File.createTempFile("screenshot", ".png");
-		ImageIO.write(image, "png", scFile);
-		logger.info("ScreenShot can be found in:"+scFile.getAbsolutePath());
-		scFile.delete();
+		if (screenshotFile == null){
+			screenshotFile = File.createTempFile("screenshot", ".png");
+			
+		}
+		ImageIO.write(image, "png", screenshotFile);
+		logger.info("ScreenShot can be found in:" + screenshotFile.getAbsolutePath());
 	}
 
 	/**
@@ -455,8 +459,9 @@ public class AdbController{
 				local.mkdirs();
 			device.getSyncService().pullFile(fileLocation + "/" + fileName, localLocation,
 					SyncService.getNullProgressMonitor());
-//			ReporterHelper.copyFileToReporterAndAddLink(report, new File(localLocation), devStr + "_" + fileName);
-//			FileUtils.deleteFile(localLocation);
+	// ReporterHelper.copyFileToReporterAndAddLink(report, new
+			// File(localLocation), devStr + "_" + fileName);
+			// FileUtils.deleteFile(localLocation);
 		} catch (Exception e) {
 			logger.error("Exception ",e);
 			throw e;
