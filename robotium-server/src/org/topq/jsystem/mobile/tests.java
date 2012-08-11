@@ -18,11 +18,11 @@ public class tests extends ActivityInstrumentationTestCase2 {
 	private static final String TARGET_PACKAGE_ID = "com.gettaxi";
 	private static final String LAUNCHER_ACTIVITY_FULL_CLASSNAME = "com.gettaxi.android.activities.login.LoadingActivity";
 	private static Class launcherActivityClass;
+	
 	static {
 
 		try {
-			launcherActivityClass = Class
-					.forName(LAUNCHER_ACTIVITY_FULL_CLASSNAME);
+			launcherActivityClass = Class.forName(LAUNCHER_ACTIVITY_FULL_CLASSNAME);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
