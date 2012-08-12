@@ -37,7 +37,7 @@ public class RobotuimClientImpel implements RobotiumClient{
 	private static String host = null;
 	private static String testName = null;
 	
-	public RobotuimClientImpel(String configFile) throws Exception{
+	public RobotuimClientImpel(String configFile,boolean doDeply) throws Exception{
 		logger = Logger.getLogger(RobotuimClientImpel.class);
 		File file = new File(configFile);
 		if(file.exists()){
@@ -66,11 +66,10 @@ public class RobotuimClientImpel implements RobotiumClient{
 		logger.debug("Host  Name is:"+temeroryProrp);
 		host = temeroryProrp;
 		adb = new AdbController(deviceSerial);
-		adb.runTestOnDevice(apkLocation,pro.getProperty("ServerConfFile"),pakageName,testClassName,testName);
+		adb.runTestOnDevice(apkLocation,pro.getProperty("ServerConfFile"),pakageName,testClassName,testName,doDeply);
 		logger.info("Start server on device");
 		setPortForwarding();
 		tcpClient = new AdbTcpClient(host, port);
-		
 		}else{
 			Exception e= new Exception("Can't fiend the file:"+file.getAbsolutePath());
 			logger.error("Can't fiend the file:"+file.getAbsolutePath());
