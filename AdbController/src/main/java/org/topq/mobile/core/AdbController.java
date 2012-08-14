@@ -543,11 +543,8 @@ public class AdbController{
 	 * @param testName
 	 * @throws Exception 
 	 */
-	public void runTestOnDevice(String serverConfFileLocation,String apkLocation,String pakageName,String testClassName,String testName,boolean doDeply) throws Exception{
-		if(doDeply){
-			installAPK(apkLocation,serverConfFileLocation);
-		}
-		getDevice(deviceIds).executeShellCommand("instrument -e class "+pakageName+"."+testClassName+"#"+testName+" "+pakageName+"/android.test.InstrumentationTestRunner",new NullOutputReceiver());
+	public void runTestOnDevice(String pakageName,String testClassName,String testName) throws Exception{
+		getDevice(deviceIds).executeShellCommand("am instrument -e class "+pakageName+"."+testClassName+"#"+testName+" "+pakageName+"/android.test.InstrumentationTestRunner",new NullOutputReceiver());
 		Thread.sleep(TimeUnit.SECONDS.toMillis(2));
 	}
 
