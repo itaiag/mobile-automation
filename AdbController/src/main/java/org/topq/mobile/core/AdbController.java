@@ -30,11 +30,13 @@ import com.android.ddmlib.TimeoutException;
  * Uses the AndroidDebugBridge object to support ADB operations.<br>
  * Holds the ADB TCP Clients.<br>
  * 
- * @see <a href="http://developer.android.com/guide/developing/tools/adb.html">ADB documentaion</a>
+ * @see <a
+ *      href="http://developer.android.com/guide/developing/tools/adb.html">ADB
+ *      documentaion</a>
  * @author topq
  * 
  */
-public class AdbController {
+public class AdbController{
 
 	public enum CommunicationBus {
 		USB, WIFI
@@ -54,8 +56,8 @@ public class AdbController {
 	private ArrayList<IDevice> devices;
 
 	/**
-	 * Init the system object. Get all the connected devices (if exist), set port forwarding & init
-	 * the TCP connection
+	 * Init the system object. Get all the connected devices (if exist), set
+	 * port forwarding & init the TCP connection
 	 */
 	public AdbController(String deviceIds) throws Exception {
 		logger = Logger.getLogger(AdbController.class);
@@ -89,13 +91,12 @@ public class AdbController {
 						char[] cbuf = new char[256];
 						buf.read(cbuf);
 						logger.debug(String.valueOf(cbuf));
-
-					} else {
-						Exception e = new Exception(
-								"Unable to communicate with the ADB try to kill the process (task manager) and re-run");
+						
+					} else{
+						Exception e =new Exception("Unable to communicate with the ADB try to kill the process (task manager) and re-run");
 						logger.error(e);
 						throw e;
-
+						
 					}
 				}
 			}
@@ -129,10 +130,12 @@ public class AdbController {
 		} else {
 			logger.info("Successfully connected to Android devices");
 			// Set port forwarding & init the TCP connection
-			// setPortForwarding();
+//			setPortForwarding();
 			// initTcpConnection();
 		}
 	}
+
+	
 
 	/**
 	 * Close system object, close the TCP connections & remove port forwarding
@@ -162,9 +165,8 @@ public class AdbController {
 						char[] cbuf = new char[256];
 						buf.read(cbuf);
 						logger.debug(String.valueOf(cbuf));
-					} else {
-						Exception e = new Exception(
-								"Unable to communicate with the ADB try to kill the process (task manager) and re-run");
+					} else{
+						Exception e = new Exception("Unable to communicate with the ADB try to kill the process (task manager) and re-run");
 						logger.error(e);
 						throw e;
 
@@ -219,9 +221,11 @@ public class AdbController {
 		}
 		return null;
 	}
+	
 
 	/**
-	 * Create the Devices list if doesnt exist already. Only online devices will be added !
+	 * Create the Devices list if doesnt exist already. Only online devices will
+	 * be added !
 	 */
 	private void getDevicesList() {
 		if (devices.size() == 0) {
@@ -255,17 +259,18 @@ public class AdbController {
 		if (device == null)
 			throw new Exception("Unable to find device with serial number: " + deviceSerial);
 
-		if (device.getState() == IDevice.DeviceState.ONLINE) {
+		if (device.getState() == IDevice.DeviceState.ONLINE){
 			device.createForward(localPort, remotePort);
-		} else {
+		}else{
 			Exception e = new Exception("Unable to perform port forwarding - " + deviceSerial + " is not online");
 			logger.error(e);
 			throw e;
 		}
 	}
-
+	
 	/**
-	 * Set port forwarding for all online devices The local ports are defined in the sut
+	 * Set port forwarding for all online devices The local ports are defined in
+	 * the sut
 	 * 
 	 * @throws Exception
 	 */
@@ -389,7 +394,7 @@ public class AdbController {
 		RawImage ri = device.getScreenshot();
 		display(device.getSerialNumber(), ri, screenshotFile);
 	}
-
+	
 	public void getScreenShots(IDevice device) throws Exception {
 		getScreenShots(device, null);
 	}
@@ -406,9 +411,9 @@ public class AdbController {
 				image.setRGB(x, y, value);
 			}
 		}
-		if (screenshotFile == null) {
+		if (screenshotFile == null){
 			screenshotFile = File.createTempFile("screenshot", ".png");
-
+			
 		}
 		ImageIO.write(image, "png", screenshotFile);
 		logger.info("ScreenShot can be found in:" + screenshotFile.getAbsolutePath());
@@ -454,13 +459,13 @@ public class AdbController {
 				local.mkdirs();
 			device.getSyncService().pullFile(fileLocation + "/" + fileName, localLocation,
 					SyncService.getNullProgressMonitor());
-			// ReporterHelper.copyFileToReporterAndAddLink(report, new
+	// ReporterHelper.copyFileToReporterAndAddLink(report, new
 			// File(localLocation), devStr + "_" + fileName);
 			// FileUtils.deleteFile(localLocation);
 		} catch (Exception e) {
-			logger.error("Exception ", e);
+			logger.error("Exception ",e);
 			throw e;
-		}
+		} 
 	}
 
 	/**
@@ -484,81 +489,66 @@ public class AdbController {
 			device.getSyncService().pushFile(localLocation, fileLocation + "/" + fileName,
 					SyncService.getNullProgressMonitor());
 		} catch (Exception e) {
-			logger.error("Exception ", e);
+			logger.error("Exception ",e);
 			throw e;
-		}
+		} 
 	}
 
 	/**
 	 * Install APK on device
 	 * 
 	 * @param apkLocation
-	 * @throws InstallException
-	 * @throws IOException
-	 * @throws ShellCommandUnresponsiveException
-	 * @throws AdbCommandRejectedException
-	 * @throws TimeoutException
+	 * @throws InstallException 
+	 * @throws IOException 
+	 * @throws ShellCommandUnresponsiveException 
+	 * @throws AdbCommandRejectedException 
+	 * @throws TimeoutException 
 	 */
-	public void installAPK(String serverConfFileLocation, String apkLocation) throws InstallException,
-			TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+	public void installAPK(String serverConfFileLocation,String apkLocation) throws InstallException, TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
 		if (devices.size() == 0)
 			getDevicesList();
 		for (int i = 0; i < devices.size(); i++) {
 			try {
 				devices.get(i).installPackage(apkLocation, true);
-				devices.get(i).executeShellCommand("cp " + serverConfFileLocation + " /data/conf.txt",
-						new NullOutputReceiver());
+				devices.get(i).executeShellCommand("cp "+serverConfFileLocation +" /data/conf.txt",new NullOutputReceiver());
 			} catch (InstallException e) {
-				logger.error("Error while installing APK file", e);
+				logger.error("Error while installing APK file",e);
 				throw e;
 			}
 		}
 	}
 
 	private File fendAdbFile() {
-		File root = new File(System.getenv("ANDROID_HOME"));
-		try {
-			String[] extensions = { "exe" };
-			boolean recursive = true;
-			Collection<File> files = FileUtils.listFiles(root, extensions, recursive);
-			for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {
-				File file = (File) iterator.next();
-				if (file.getName().compareTo("adb.exe") == 0) {
+		File root = new File(System.getenv("ANDROID_HOME"));      
+		try {            
+			String[] extensions = {"exe"};      
+			boolean recursive = true;          
+			Collection<File> files = FileUtils.listFiles(root, extensions, recursive);        
+			for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {         
+				File file = (File) iterator.next();         
+				if(file.getName().compareTo("adb.exe") == 0){
 					return file.getParentFile();
 				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			}    
+		} catch (Exception e) {   
+			e.printStackTrace();       
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Limor B
-	 * 
 	 * @param pakageName
 	 * @param testClassName
 	 * @param testName
-	 * @throws Exception
+	 * @throws Exception 
 	 */
-	public void runTestOnDevice(String serverConfFileLocation, String apkLocation, String pakageName,
-			String testClassName, String testName, boolean doDeply) throws Exception {
-		if (doDeply) {
-			installAPK(apkLocation, serverConfFileLocation);
-		}
-//		getDevice(deviceIds).executeShellCommand(
-//				"instrument -e class " + pakageName + "." + testClassName + "#" + testName + " " + pakageName
-//						+ "/android.test.InstrumentationTestRunner", new NullOutputReceiver());
-		String cmd = adbLocation.getAbsolutePath() + "\\adb -s " + deviceIds + " shell am instrument -e class "
-				+ pakageName + "." + testClassName + "#" + testName + " " + pakageName
-				+ "/android.test.InstrumentationTestRunner";
-		Runtime run = Runtime.getRuntime();
-		Process pr = run.exec(cmd);
-		pr.waitFor();
-
+	public void runTestOnDevice(String pakageName,String testClassName,String testName) throws Exception{
+		getDevice(deviceIds).executeShellCommand("am instrument -e class "+pakageName+"."+testClassName+"#"+testName+" "+pakageName+"/android.test.InstrumentationTestRunner",new NullOutputReceiver());
 		Thread.sleep(TimeUnit.SECONDS.toMillis(2));
 	}
 
+	
 	public CommunicationBus getCommunicationBus() {
 		return communicationBus;
 	}

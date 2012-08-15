@@ -1,20 +1,9 @@
 package org.topq.jsystem.mobile;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.topq.jsystem.util.ConfUtil;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
-import android.view.KeyEvent;
 
 import com.jayway.android.robotium.solo.Solo;
 
@@ -46,6 +35,10 @@ IDataCallback, ISoloProvider {
 		super(confUtil.getConffigParmters("TARGET_PACKAGE_ID"), launcherActivityClass);
 		Log.i(TAG, "Target package ID is:" + confUtil.getConffigParmters("TARGET_PACKAGE_ID"));
 	}
+	
+	
+	
+	
 
 	public void testMain() throws InterruptedException {
 		TcpServer server = new TcpServer();
@@ -59,6 +52,14 @@ IDataCallback, ISoloProvider {
 		}
 	}
 	
+	public void testNewTest() throws Exception{
+		Log.i(TAG, "**************HERE***************");
+		for (int i = 0 ; i < 10 ; i++){
+			Log.w(TAG, "ANOTHER MESSAGE");
+			System.out.println("ANOTHER MESSAGE");
+		}
+	}
+	
 	public void testDebug(){
 		Solo solo = getSolo();
 		solo.clickInList(1);
@@ -66,6 +67,7 @@ IDataCallback, ISoloProvider {
 		solo.enterText(0, "1");
 		solo.enterText(0, "1");
 	}
+	
 
 	@Override
 	public String dataReceived(String data) {

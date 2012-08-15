@@ -26,6 +26,9 @@ public class SoloExecutor {
 		for (CommandParser command : parser.getCommands()) {
 			Log.d(TAG, "Process command: " + command.getCommand());
 			if (command.getCommand().equals("enterText")) {
+				result += SUCCESS_STRING + "Mock tests";
+			}
+			if (command.getCommand().equals("enterText")) {
 				result += enterText(command.getArguments());
 			} else if (command.getCommand().equals("clickOnButton")) {
 				result += clickOnButton(command.getArguments());
@@ -255,6 +258,7 @@ public class SoloExecutor {
 	}
 
 	private String launch() {
+		Log.i(TAG, "Robotium: About to launch application");
 		String command = "the command  launch";
 		try {
 			solo = soloProvider.getSolo();

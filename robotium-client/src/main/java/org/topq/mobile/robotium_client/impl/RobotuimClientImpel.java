@@ -2,14 +2,9 @@ package org.topq.mobile.robotium_client.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
-
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.topq.mobile.core.AdbController;
 import org.topq.mobile.core.GeneralEnums;
@@ -17,11 +12,8 @@ import org.topq.mobile.robotium_client.infrastructure.AdbTcpClient;
 import org.topq.mobile.robotium_client.interfaces.RobotiumClient;
 
 import com.android.ddmlib.IDevice;
-/**
- * 
- * @author Bortman Limor
- *
- */
+
+
 public class RobotuimClientImpel implements RobotiumClient{
 	
 	
@@ -49,24 +41,24 @@ public class RobotuimClientImpel implements RobotiumClient{
 		port = Integer.parseInt(temeroryProrp);
 		temeroryProrp = pro.getProperty("DeviceSerail");
 		logger.debug("In Properties file DeviceSerial is:"+temeroryProrp);
-		deviceSerial = temeroryProrp;
-		temeroryProrp = pro.getProperty("ApkLocation");
-		logger.debug("APK location is:"+temeroryProrp);
 		apkLocation = temeroryProrp;
-		temeroryProrp = pro.getProperty("PakageName");
-		logger.debug("Pakage Name is:"+temeroryProrp);
-		pakageName = temeroryProrp;
-		temeroryProrp = pro.getProperty("TestClassName");
-		logger.debug("Test Class Name is:"+temeroryProrp);
-		testClassName = temeroryProrp;
-		temeroryProrp = pro.getProperty("TestName");
-		logger.debug("Test  Name is:"+temeroryProrp);
-		testName = temeroryProrp;
-		temeroryProrp = pro.getProperty("Host");
-		logger.debug("Host  Name is:"+temeroryProrp);
-		host = temeroryProrp;
+		temeroryProrp = pro.getProperty("ApkLocation");
+		logger.debug("APK location is:"+apkLocation);
+		pakageName = pro.getProperty("PakageName");
+		logger.debug("Pakage Name is:"+pakageName);
+		testClassName = pro.getProperty("TestClassName");
+		logger.debug("Test Class Name is:"+testClassName);
+		testName = pro.getProperty("TestName");
+		logger.debug("Test  Name is:"+testName);
+		host = pro.getProperty("Host");
+		logger.debug("Host  Name is:"+host);
+		deviceSerial=pro.getProperty("DeviceSerail");
 		adb = new AdbController(deviceSerial);
-		adb.runTestOnDevice(apkLocation,pro.getProperty("ServerConfFile"),pakageName,testClassName,testName,doDeply);
+		String serverConfFileLocation = pro.getProperty("ServerConfFile");
+		if(doDeply){
+			adb.installAPK(serverConfFileLocation, temeroryProrp);
+		}
+		adb.runTestOnDevice(pakageName,testClassName,testName);
 		logger.info("Start server on device");
 		setPortForwarding();
 		tcpClient = new AdbTcpClient(host, port);
@@ -116,7 +108,7 @@ public class RobotuimClientImpel implements RobotiumClient{
 		}
 		return result;
 	}
-	
+
 
 	public String launch() throws Exception {
 		return sendData("{launch;}");
