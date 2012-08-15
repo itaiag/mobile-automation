@@ -116,7 +116,7 @@ public class RobotuimClientImpel implements RobotiumClient{
 		}
 		return result;
 	}
-
+	
 
 	public String launch() throws Exception {
 		return sendData("{launch;}");

@@ -11,6 +11,8 @@ public interface RobotiumClient {
 	
 //	public void connect() throws Exception ;
 	
+	
+	
 	public String launch() throws Exception;
 	
 	public String getTextView(int index) throws Exception ;
