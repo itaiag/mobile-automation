@@ -1,12 +1,6 @@
 package org.topq.mobile.frank_ssh;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.log4j.Logger;
-import org.junit.internal.ExactComparisonCriteria;
-import org.topq.mobile.frank_client.imp.FrankClientImpl;
-import org.topq.mobile.frank_client.interfaces.FrankClient;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.IOUtils;
@@ -15,7 +9,11 @@ import net.schmizz.sshj.connection.channel.direct.Session.Command;
 import net.schmizz.sshj.xfer.FileSystemFile;
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer;
 
-import com.dhemery.configuration.Configuration;
+import org.apache.log4j.Logger;
+import org.topq.mobile.frank_client.imp.FrankClientImpl;
+import org.topq.mobile.frank_client.interfaces.FrankClient;
+
+import com.dhemery.configuring.Configuration;
 import com.dhemery.victor.IosDevice;
 
 
@@ -96,6 +94,11 @@ public class SshIosDevice implements IosDevice{
 		}
 		lestResult = FrankClient.SUCCESS_STRING;
 
+	}
+
+	public String type() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

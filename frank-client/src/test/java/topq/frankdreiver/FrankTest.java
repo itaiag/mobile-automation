@@ -8,7 +8,7 @@ import org.topq.mobile.frank_client.interfaces.FrankClient;
  * @author Bortman Limor
  *
  */
-public class frankTest {
+public class FrankTest {
 	FrankClient frank = new FrankClientImpl();
 
 
