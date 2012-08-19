@@ -9,7 +9,7 @@ import org.topq.mobile.frank_client.interfaces.FrankClient;
  *
  */
 public class FrankTest {
-	FrankClient frank = new FrankClientImpl();
+	FrankClient frank = new FrankClientImpl("C:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\frank-client\\src\\resources\\test.properties");
 
 
 	@Test
