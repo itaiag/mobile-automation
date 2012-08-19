@@ -11,6 +11,7 @@ import com.dhemery.configuring.Configuration;
 import com.dhemery.configuring.LoadProperties;
 import com.dhemery.victor.IosApplication;
 import com.dhemery.victor.IosDevice;
+import com.dhemery.victor.UIQuery;
 import com.dhemery.victor.Victor;
 import com.dhemery.publishing.*;
 import  com.dhemery.victor.Igor;
@@ -21,22 +22,17 @@ import  com.dhemery.victor.Igor;
  */
 public class FrankClientImpl implements FrankClient {
 
-	private final static IosApplication application;
+	private static IosApplication application;
 	private static IosDevice device = null;
-	private final static Configuration configuration;
-//	private By query = null;
+	private static Configuration configuration;
 	private static Logger logger = null;
 
-	static {
+	public FrankClientImpl(String fileName){
 		configuration = new Configuration();
-		LoadProperties
-				.fromFiles(
-						"C:\\Users\\Vadim\\Limor\\workspace\\frankd-client\\src\\resources\\test.propertie")
-				.into(configuration);
+		LoadProperties.fromFiles(fileName).into(configuration);
 
 		Victor victor = new Victor(configuration);
 		application = victor.application();
-		// application = CreateIosApplication.withConfiguration(configuration);
 		logger = Logger.getLogger(FrankClientImpl.class);
 	}
 
@@ -46,10 +42,7 @@ public class FrankClientImpl implements FrankClient {
 		return (String) ((SshIosDevice) device).getLestResult();
 	}
 
-	// public CharSequence nevigte(String UITabBarButtonMarkeder){
-	// return
-	// sendMassageWithMarkerAsString("UITabBarButton",UITabBarButtonMarkeder,"tap");
-	// }
+
 
 	public String getTextView(int index) throws Exception {
 		// TODO Auto-generated method stub
@@ -67,8 +60,7 @@ public class FrankClientImpl implements FrankClient {
 	}
 
 	public String getText(int index) throws Exception {
-		return (String) sendMessageWithRespons("UITextField",
-				Integer.toString(index), "text");
+		return (String) sendMessageWithRespons("textField",Integer.toString(index), "text");
 	}
 
 	public String clickOnMenuItem(String item) throws Exception {
@@ -76,19 +68,17 @@ public class FrankClientImpl implements FrankClient {
 		return null;
 	}
 
-	public CharSequence clickOnView(String view, String marker)
-			throws Exception {
+	public CharSequence clickOnView(String view, String marker)throws Exception {
 		return sendMassageWithMarkerAsString(view, marker, "tap");
 	}
 
 	public String enterText(int index, String text) throws Exception {
-		return sendMassageWithMarkerAsInt("UITextField", index, "setText:",
-				text);
+		return sendMassageWithMarkerAsInt("textField", index, "setText:",text);
 
 	}
 
 	public String clickInList(int index) throws Exception {
-		return sendMassageWithMarkerAsInt("UITableViewCell", index, "tap");
+		return sendMassageWithMarkerAsInt("tableViewCell", index, "tap");
 	}
 
 	public String clearEditText(int index) throws Exception {
@@ -96,7 +86,11 @@ public class FrankClientImpl implements FrankClient {
 	}
 
 	public String clickOnButtonWithText(String text) throws Exception {
-		return sendMassageWithMarkerAsString("UIButton", text, "tap");
+		return sendMassageWithMarkerAsString("button", text, "tap");
+	}
+	
+	public String clickOnButton(int index) throws Exception {
+		return sendMassageWithMarkerAsInt("button", index, "tap");
 	}
 
 	public String clickOnText(String text) throws Exception {
@@ -113,53 +107,46 @@ public class FrankClientImpl implements FrankClient {
 		device.stop();
 
 	}
-
-	private CharSequence sendMessageWithRespons(String view, String marker,
-			String command, Object... arguments) {
-//		query = By.uiQuery("view:'" + view + "' marked:" + marker);
-		List<String> result = application.view(Igor.igor(view)).sendMessage(command,
-				arguments);
-		if (result.size() < 0) {
-			return ERROR_STRING;
-		} else {
-			return result.get(0);
-		}
-
+	
+	public String clickOnView(int index) throws Exception {
+		return sendMassageWithMarkerAsInt("view", index, "tap");
 	}
 
-	private String sendMessage(String view, String marker, String command,
-			Object... arguments) {
-		CharSequence result = sendMessageWithRespons(view, marker, command,
-				arguments);
+
+	public String goBack() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+
+	private String sendMessage(String uiQueryPatern, String command,Object... arguments) {
+		CharSequence result = sendMessageWithRespons(uiQueryPatern, command,arguments);
 		if (!result.equals(ERROR_STRING)) {
 			return (String) SUCCESS_STRING;
 		}
 		return (String) result;
 	}
+	
+	private CharSequence sendMessageWithRespons(String uiQueryPatern,String command, Object... arguments) {
+		List<String> result = application.view(UIQuery.uiquery(uiQueryPatern)).sendMessage(command,arguments);
+		if (result.size() <= 0) {
+			return ERROR_STRING;
+		} else {
+			if(result.get(0) != null){
+				return result.get(0);
+			}else{
+				return SUCCESS_STRING;
+			}
+		}
 
-	private String sendMassageWithMarkerAsString(String view, String marker,
-			String command, Object... arguments) {
-		return sendMessage(view, "'" + marker + "'", command, arguments);
 	}
 
-	private String sendMassageWithMarkerAsInt(String view, int marker,
-			String command, Object... arguments) {
-		return sendMessage(view, Integer.toString(marker), command, arguments);
+	private String sendMassageWithMarkerAsString(String view, String marker,String command, Object... arguments) {
+		return sendMessage(view +" marked:"+marker, command, arguments);
 	}
 
-	public String clickOnView(int index) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String clickOnButton(int index) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String goBack() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	private String sendMassageWithMarkerAsInt(String view, int marker,String command, Object... arguments) {
+		return sendMessage(view +" tag:"+Integer.toString(marker), command, arguments);
 	}
 
 }
