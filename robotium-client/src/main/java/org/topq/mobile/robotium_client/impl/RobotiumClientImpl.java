@@ -14,7 +14,7 @@ import org.topq.mobile.robotium_client.interfaces.RobotiumClient;
 import com.android.ddmlib.IDevice;
 
 
-public class RobotuimClientImpel implements RobotiumClient{
+public class RobotiumClientImpl implements RobotiumClient{
 	
 	
 	private AdbTcpClient tcpClient;
@@ -29,8 +29,8 @@ public class RobotuimClientImpel implements RobotiumClient{
 	private static String host = null;
 	private static String testName = null;
 	
-	public RobotuimClientImpel(String configFile,boolean doDeply) throws Exception{
-		logger = Logger.getLogger(RobotuimClientImpel.class);
+	public RobotiumClientImpl(String configFile,boolean doDeply) throws Exception{
+		logger = Logger.getLogger(RobotiumClientImpl.class);
 		File file = new File(configFile);
 		if(file.exists()){
 		Properties pro = new Properties();
