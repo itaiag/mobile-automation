@@ -14,11 +14,8 @@ import org.topq.mobile.robotium_client.infrastructure.AdbTcpClient;
 import com.android.ddmlib.IDevice;
 
 
-<<<<<<< HEAD:robotium-client/src/main/java/org/topq/mobile/robotium_client/impl/RobotuimClientImpel.java
-public class RobotuimClientImpel implements MobileClintInterface{
-=======
-public class RobotiumClientImpl implements RobotiumClient{
->>>>>>> 2b301e0b4e9f6510a4025c510af65cc1c947ea9d:robotium-client/src/main/java/org/topq/mobile/robotium_client/impl/RobotiumClientImpl.java
+public class RobotiumClientImpl implements MobileClintInterface{
+
 	
 	
 	private AdbTcpClient tcpClient;

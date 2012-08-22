@@ -1,0 +1,32 @@
+#surefire
+#Wed Aug 22 23:06:51 IDT 2012
+testClassesDirectory=C\:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\robotium-client\\target\\test-classes
+classPathUrl.4=C\:\\Users\\Vadim\\.m2\\repository\\org\\topq\\mobile\\common-mobile\\0.0.1-SNAPSHOT\\common-mobile-0.0.1-SNAPSHOT.jar
+classPathUrl.3=C\:\\Users\\Vadim\\.m2\\repository\\log4j\\log4j\\1.2.4\\log4j-1.2.4.jar
+classPathUrl.2=C\:\\Users\\Vadim\\.m2\\repository\\junit\\junit\\3.8.1\\junit-3.8.1.jar
+useManifestOnlyJar=true
+classPathUrl.1=C\:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\robotium-client\\target\\classes
+reportsDirectory=C\:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\robotium-client\\target\\surefire-reports
+classPathUrl.0=C\:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\robotium-client\\target\\test-classes
+dirscanner.0=directoryScannerOptions
+providerConfiguration=org.apache.maven.surefire.junit.JUnit3Provider
+testSuiteDefinitionTestSourceDirectory=C\:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\robotium-client\\src\\test\\java
+surefireClassPathUrl.1=C\:\\Users\\Vadim\\.m2\\repository\\org\\apache\\maven\\surefire\\surefire-api\\2.7.1\\surefire-api-2.7.1.jar
+surefireClassPathUrl.0=C\:\\Users\\Vadim\\.m2\\repository\\org\\apache\\maven\\surefire\\surefire-junit3\\2.7.1\\surefire-junit3-2.7.1.jar
+report.2=org.apache.maven.surefire.report.XMLReporter
+useSystemClassLoader=true
+report.1=org.apache.maven.surefire.report.BriefFileReporter
+report.0=org.apache.maven.surefire.report.ForkingConsoleReporter
+excludes0=**/*$*
+isTrimStackTrace=true
+dirscanner.0.params=C\:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\robotium-client\\target\\test-classes|[**/Test*.java, **/*Test.java, **/*TestCase.java]|[**/*$*]
+includes2=**/*TestCase.java
+enableAssertions=true
+includes1=**/*Test.java
+failIfNoTests=false
+includes0=**/Test*.java
+dirscanner.0.types=java.io.File|java.util.ArrayList|java.util.ArrayList
+classPathUrl.7=C\:\\Users\\Vadim\\.m2\\repository\\commons-io\\commons-io\\1.4\\commons-io-1.4.jar
+childDelegation=false
+classPathUrl.6=C\:\\Users\\Vadim\\.m2\\repository\\com\\google\\android\\tools\\ddmlib\\r10\\ddmlib-r10.jar
+classPathUrl.5=C\:\\Users\\Vadim\\.m2\\repository\\org\\topq\\mobile\\AdbController\\1.0-SNAPSHOT\\AdbController-1.0-SNAPSHOT.jar
