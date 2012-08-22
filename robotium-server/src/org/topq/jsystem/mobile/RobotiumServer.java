@@ -89,7 +89,7 @@ IDataCallback, ISoloProvider {
 
 	private SoloExecutor getExecutor(){
 		if(executor == null){
-			executor = new SoloExecutor(this);
+			executor = new SoloExecutor(this,getInstrumentation());
 		}
 		return executor;
 	}

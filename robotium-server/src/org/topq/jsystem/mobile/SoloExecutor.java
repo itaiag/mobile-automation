@@ -2,7 +2,9 @@ package org.topq.jsystem.mobile;
 
 import java.util.List;
 
+import android.app.Instrumentation;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.jayway.android.robotium.solo.Solo;
@@ -12,12 +14,14 @@ public class SoloExecutor {
 	private static final String TAG = "SoloExecutor";
 	private static final String SUCCESS_STRING = "SUCCESS:";
 	private static final String ERROR_STRING = "ERROR:";
+	private Instrumentation instrumentation;
 	private Solo solo;
 	private final ISoloProvider soloProvider;
 
-	public SoloExecutor(final ISoloProvider soloProvider) {
+	public SoloExecutor(final ISoloProvider soloProvider,Instrumentation instrumentation) {
 		super();
 		this.soloProvider = soloProvider;
+		this.instrumentation = instrumentation;
 	}
 
 	public String execute(final String data) {
@@ -58,6 +62,9 @@ public class SoloExecutor {
 				result += getTextView(command.getArguments());
 			} else if (command.getCommand().equals("getCurrentTextViews")) {
 				result += getCurrentTextViews(command.getArguments());
+			} else if (command.getCommand().equals("clickOnHardware")) {
+				result+=clickOnHardware(command.getArguments());
+			
 			}
 		}
 		return result;
@@ -255,6 +262,11 @@ public class SoloExecutor {
 		}
 		return SUCCESS_STRING + command;
 
+	}
+	private String clickOnHardware(String[] keyString){
+		int key = (keyString[0] == "KEYCODE_HOME" )? KeyEvent.KEYCODE_HOME : KeyEvent.KEYCODE_BACK;
+		instrumentation.sendKeyDownUpSync(key);
+		return SUCCESS_STRING + "click on hardware";
 	}
 
 	private String launch() {

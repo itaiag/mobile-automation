@@ -1,15 +1,16 @@
 package topq.frankdreiver;
 
 import org.junit.Test;
+import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.frank_client.imp.FrankClientImpl;
-import org.topq.mobile.frank_client.interfaces.FrankClient;
+
 /**
  * 
  * @author Bortman Limor
  *
  */
 public class FrankTest {
-	FrankClient frank = new FrankClientImpl("C:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\frank-client\\src\\resources\\test.properties");
+	MobileClintInterface frank = new FrankClientImpl("C:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\frank-client\\src\\resources\\test.properties");
 
 
 	@Test

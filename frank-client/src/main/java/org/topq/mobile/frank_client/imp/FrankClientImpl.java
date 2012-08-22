@@ -1,10 +1,9 @@
 package org.topq.mobile.frank_client.imp;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.topq.mobile.frank_client.interfaces.FrankClient;
+import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.frank_ssh.SshIosDevice;
 
 import com.dhemery.configuring.Configuration;
@@ -13,14 +12,12 @@ import com.dhemery.victor.IosApplication;
 import com.dhemery.victor.IosDevice;
 import com.dhemery.victor.UIQuery;
 import com.dhemery.victor.Victor;
-import com.dhemery.publishing.*;
-import  com.dhemery.victor.Igor;
 /**
  * 
  * @author Bortman Limor
  * 
  */
-public class FrankClientImpl implements FrankClient {
+public class FrankClientImpl implements MobileClintInterface {
 
 	private static IosApplication application;
 	private static IosDevice device = null;
