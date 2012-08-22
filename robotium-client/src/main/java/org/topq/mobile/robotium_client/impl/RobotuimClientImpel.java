@@ -6,15 +6,15 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.core.AdbController;
 import org.topq.mobile.core.GeneralEnums;
 import org.topq.mobile.robotium_client.infrastructure.AdbTcpClient;
-import org.topq.mobile.robotium_client.interfaces.RobotiumClient;
 
 import com.android.ddmlib.IDevice;
 
 
-public class RobotuimClientImpel implements RobotiumClient{
+public class RobotuimClientImpel implements MobileClintInterface{
 	
 	
 	private AdbTcpClient tcpClient;
