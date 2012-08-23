@@ -1,4 +1,7 @@
 package org.topq.mobile.common_mobile.client.interfaces;
+
+import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
+
 /**
  * 
  * @author Bortman Limor
@@ -36,7 +39,9 @@ public interface MobileClintInterface {
 	
 	public String clickOnText(String text) throws Exception;
 
-	public String goBack() throws Exception;
+//	public String goBack() throws Exception;
+	
+	public String clickOnHardwereButton(HardwareButtons button) throws Exception;
 	
 	public String sendKey(int key) throws Exception;
 	
