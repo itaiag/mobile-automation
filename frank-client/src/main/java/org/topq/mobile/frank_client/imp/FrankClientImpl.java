@@ -3,6 +3,7 @@ package org.topq.mobile.frank_client.imp;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
 import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.frank_ssh.SshIosDevice;
 
@@ -114,7 +115,12 @@ public class FrankClientImpl implements MobileClintInterface {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+	@Override
+	public String clickOnHardwereButton(HardwareButtons button)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	private String sendMessage(String uiQueryPatern, String command,Object... arguments) {
 		CharSequence result = sendMessageWithRespons(uiQueryPatern, command,arguments);
@@ -145,5 +151,6 @@ public class FrankClientImpl implements MobileClintInterface {
 	private String sendMassageWithMarkerAsInt(String view, int marker,String command, Object... arguments) {
 		return sendMessage(view +" tag:"+Integer.toString(marker), command, arguments);
 	}
+
 
 }
