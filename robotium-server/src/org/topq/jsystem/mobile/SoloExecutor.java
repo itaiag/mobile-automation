@@ -264,7 +264,7 @@ public class SoloExecutor {
 
 	}
 	private String clickOnHardware(String[] keyString){
-		int key = (keyString[0] == "KEYCODE_HOME" )? KeyEvent.KEYCODE_HOME : KeyEvent.KEYCODE_BACK;
+		int key = (keyString[0] == "HOME" )? KeyEvent.KEYCODE_HOME : KeyEvent.KEYCODE_BACK;
 		instrumentation.sendKeyDownUpSync(key);
 		return SUCCESS_STRING + "click on hardware";
 	}
