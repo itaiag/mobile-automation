@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
 import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.core.AdbController;
 import org.topq.mobile.core.GeneralEnums;
@@ -164,6 +165,11 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	public String clickOnText(String text) throws Exception {
 		return sendData("{clickOnText," + text + ";}");
 	}
+	@Override
+	public String clickOnHardwereButton(HardwareButtons button)
+			throws Exception {
+		return sendData("{clickOnHardware,"+button.name()+";}");
+	}
 
 	public String goBack() throws Exception {
 		return sendData("{goBack,;}");
@@ -186,6 +192,7 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	public void setAdb(AdbController adb) {
 		this.adb = adb;
 	}
+	
 
 	private void setPortForwarding() throws Exception {
 		IDevice device = getDevice();
@@ -207,5 +214,7 @@ public class RobotiumClientImpl implements MobileClintInterface{
 		}
 		return device;
 	}
+
+
 
 }
