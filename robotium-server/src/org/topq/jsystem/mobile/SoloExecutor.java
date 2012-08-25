@@ -34,20 +34,16 @@ public class SoloExecutor {
 		JSONObject result = new JSONObject();
 			parser = new ScriptParser(data);
 		for (CommandParser command : parser.getCommands()) {
-			Log.d(TAG, "Process command: " + command.getCommand());
 			if (command.getCommand().equals("enterText")) {
-				result.put(RESULT_STRING,SUCCESS_STRING + "Mock tests");
-			}
-			if (command.getCommand().equals("enterText")) {
-				result.put(RESULT_STRING,command.getArguments());
+				result.put(RESULT_STRING,enterText(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnButton")) {
-				result.put(RESULT_STRING,command.getArguments());
+				result.put(RESULT_STRING,clickOnButton(command.getArguments()));
 			} else if (command.getCommand().equals("launch")) {
 				result.put(RESULT_STRING,launch());
 			} else if (command.getCommand().equals("clickInList")) {
 				result.put(RESULT_STRING,clickInList(command.getArguments()));
 			} else if (command.getCommand().equals("clearEditText")) {
-				result.put(RESULT_STRING,command.getArguments());
+				result.put(RESULT_STRING,clearEditText(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnButtonWithText")) {
 				result.put(RESULT_STRING,clickOnButtonWithText(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnView")) {
