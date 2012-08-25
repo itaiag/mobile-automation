@@ -8,6 +8,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import org.json.JSONObject;
+
 //import com.nuvoton.common.GeneralEnums;
 
 import android.util.Log;
@@ -68,7 +70,7 @@ public class TcpServer implements Runnable {
 				line = in.readLine();
 				if(line!=null){
 					Log.d(TAG, "Received: '" + line + "'");
-					String response = null;
+					JSONObject response = null;
 					for (IDataCallback listener : listeners) {
 						// TODO: This is not the best implementation. The
 						// response should be handled differently.

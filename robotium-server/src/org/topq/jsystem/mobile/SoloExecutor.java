@@ -2,6 +2,10 @@ package org.topq.jsystem.mobile;
 
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Instrumentation;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -14,6 +18,7 @@ public class SoloExecutor {
 	private static final String TAG = "SoloExecutor";
 	private static final String SUCCESS_STRING = "SUCCESS:";
 	private static final String ERROR_STRING = "ERROR:";
+	private static final String RESULT_STRING ="RESULT";
 	private Instrumentation instrumentation;
 	private Solo solo;
 	private final ISoloProvider soloProvider;
@@ -24,57 +29,61 @@ public class SoloExecutor {
 		this.instrumentation = instrumentation;
 	}
 
-	public String execute(final String data) {
-		ScriptParser parser = new ScriptParser(data);
-		String result = "";
+	public JSONObject execute(final String data) throws JSONException  {
+		ScriptParser parser;
+		JSONObject result = new JSONObject();
+			parser = new ScriptParser(data);
 		for (CommandParser command : parser.getCommands()) {
 			Log.d(TAG, "Process command: " + command.getCommand());
 			if (command.getCommand().equals("enterText")) {
-				result += SUCCESS_STRING + "Mock tests";
+				result.put(RESULT_STRING,SUCCESS_STRING + "Mock tests");
 			}
 			if (command.getCommand().equals("enterText")) {
-				result += enterText(command.getArguments());
+				result.put(RESULT_STRING,command.getArguments());
 			} else if (command.getCommand().equals("clickOnButton")) {
-				result += clickOnButton(command.getArguments());
+				result.put(RESULT_STRING,command.getArguments());
 			} else if (command.getCommand().equals("launch")) {
-				result += launch();
+				result.put(RESULT_STRING,launch());
 			} else if (command.getCommand().equals("clickInList")) {
-				result += clickInList(command.getArguments());
+				result.put(RESULT_STRING,clickInList(command.getArguments()));
 			} else if (command.getCommand().equals("clearEditText")) {
-				result += clearEditText(command.getArguments());
+				result.put(RESULT_STRING,command.getArguments());
 			} else if (command.getCommand().equals("clickOnButtonWithText")) {
-				result += clickOnButtonWithText(command.getArguments());
+				result.put(RESULT_STRING,clickOnButtonWithText(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnView")) {
-				result += clickOnView(command.getArguments());
+				result.put(RESULT_STRING,clickOnView(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnText")) {
-				result += clickOnText(command.getArguments());
-			} else if (command.getCommand().equals("goBack")) {
-				result += goBack();
+				result.put(RESULT_STRING,clickOnText(command.getArguments()));
 			} else if (command.getCommand().equals("sendKey")) {
-				result += sendKey(command.getArguments());
+				result.put(RESULT_STRING,sendKey(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnMenuItem")) {
-				result += clickOnMenuItem(command.getArguments());
+				result.put(RESULT_STRING,clickOnMenuItem(command.getArguments()));
 			} else if (command.getCommand().equals("getText")) {
-				result += getText(command.getArguments());
+				result.put(RESULT_STRING,getText(command.getArguments()));
 			} else if (command.getCommand().equals("getTextViewIndex")) {
-				result += getTextViewIndex(command.getArguments());
+				result.put(RESULT_STRING,getTextViewIndex(command.getArguments()));
 			} else if (command.getCommand().equals("getTextView")) {
-				result += getTextView(command.getArguments());
+				result.put(RESULT_STRING,getTextView(command.getArguments()));
 			} else if (command.getCommand().equals("getCurrentTextViews")) {
-				result += getCurrentTextViews(command.getArguments());
+				result.put(RESULT_STRING,getCurrentTextViews(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnHardware")) {
-				result+=clickOnHardware(command.getArguments());
+				result.put(RESULT_STRING,clickOnHardware(command.getArguments()));
 			
 			}
 		}
+	
 		return result;
 
 	}
 
-	private String getCurrentTextViews(String[] arguments) {
-		String command = "the command  getCurrentTextViews(" + arguments[0] + ")";
+
+	private String getCurrentTextViews(JSONArray arguments) {
+		String command = "the command  getCurrentTextViews";
 		StringBuilder response = new StringBuilder();
 		try {
+
+			command+="(" + arguments.getString(0) + ")";
+
 			List<TextView> textViews = solo.getCurrentTextViews(null);
 			for (int i = 0; i < textViews.size(); i++) {
 				response.append(i).append(",").append(textViews.get(i).getText().toString()).append(";");
@@ -83,32 +92,39 @@ public class SoloExecutor {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
-
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command + ",Response: " + response.toString();
 	}
 
-	private String getTextView(String[] arguments) {
-		String command = "the command  getTextView(" + arguments[0] + ")";
+	private String getTextView(JSONArray arguments) {
+		String command = "the command  getTextView";
 		String response = "";
 		try {
-			response = solo.getCurrentTextViews(null).get(Integer.parseInt(arguments[0])).getText().toString();
+			command+="(" + arguments.getInt(0) + ")";
+			response = solo.getCurrentTextViews(null).get(arguments.getInt(0)).getText().toString();
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
 
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command + ",Response: " + response;
 	}
 
-	private String getTextViewIndex(String[] arguments) {
-		String command = "the command  getTextViewIndex(" + arguments[0] + ")";
+	private String getTextViewIndex(JSONArray arguments) {
+		String command = "the command  getTextViewIndex";
 		StringBuilder response = new StringBuilder();
 		try {
+			command+="(" + arguments.getString(0) + ")";
 			List<TextView> textViews = solo.getCurrentTextViews(null);
 			for (int i = 0; i < textViews.size(); i++) {
-				if (arguments[0].trim().equals(textViews.get(i).getText().toString())) {
+				if (arguments.getString(0).trim().equals(textViews.get(i).getText().toString())) {
 					response.append(i).append(";");
 				}
 			}
@@ -117,155 +133,193 @@ public class SoloExecutor {
 			Log.d(TAG, error);
 			return error;
 
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command + ",Response: " + response.toString();
 	}
 
-	private String getText(String[] arguments) {
-		String command = "the command  getText(" + arguments[0] + ")";
+	private String getText(JSONArray arguments) {
+		String command = "the command  getText";
 		String response = "";
 		try {
-			response = solo.getText(Integer.parseInt(arguments[0])).getText().toString();
+			command+="(" + arguments.getString(0) + ")";
+			response = solo.getText(arguments.getInt(0)).getText().toString();
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
 
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command + ",Response: " + response;
 	}
 
-	private String clickOnMenuItem(String[] arguments) {
-		String command = "the command  clickOnMenuItem(" + arguments[0] + ")";
+	private String clickOnMenuItem(JSONArray arguments) {
+		String command = "the command  clickOnMenuItem";
 		try {
-			solo.clickOnMenuItem(arguments[0]);
+			command+="(" + arguments.getString(0) + ")";
+			solo.clickOnMenuItem(arguments.getString(0));
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
 
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command;
 	}
 
-	private String sendKey(String[] arguments) {
-		String command = "the command  sendKey(" + arguments[0] + ")";
+	private String sendKey(JSONArray arguments) {
+		String command = "the command  sendKey";
 		try {
-			solo.sendKey(Integer.parseInt(arguments[0]));
+			command+="(" + arguments.getString(0) + ")";
+			solo.sendKey(arguments.getInt(0));
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
-
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command;
 	}
 
-	private String goBack() {
-		String command = "the command  goBack()";
+	private String clickOnView(JSONArray arguments) {
+		String command = "the command  clickOnView";
 		try {
-			solo.goBack();
+			command+="(" + arguments.getString(0) + ")";
+			solo.clickOnView(solo.getCurrentViews().get((arguments.getInt(0))));
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
-
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command;
 	}
 
-	private String clickOnView(String[] arguments) {
-		String command = "the command  clickOnView(" + arguments[0] + ")";
+	private String clickOnButtonWithText(JSONArray arguments) {
+		String command = "the command  clickOnButton";
 		try {
-			solo.clickOnView(solo.getCurrentViews().get(Integer.parseInt(arguments[0])));
+			command+="(" + arguments.getString(0) + ")";
+			solo.clickOnButton(arguments.getString(0));
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
-
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command;
 	}
 
-	private String clickOnButtonWithText(String[] arguments) {
-		String command = "the command  clickOnButton(" + arguments[0] + ")";
+	private String clearEditText(JSONArray arguments) {
+		String command = "the command  clearEditText";
 		try {
-			solo.clickOnButton(arguments[0]);
+			command+="(" + arguments.getString(0) + ")";
+			solo.clearEditText(arguments.getInt(0));
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command;
 	}
 
-	private String clearEditText(String[] arguments) {
-		String command = "the command  clearEditText(" + arguments[0] + ")";
+	private String clickInList(JSONArray arguments) {
+		String command = "the command  clickInList(";
 		try {
-			solo.clearEditText(Integer.parseInt(arguments[0]));
+			command+="(" + arguments.getString(0) + ")";
+			solo.clickInList(arguments.getInt(0));
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
+		}catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command;
+
 	}
 
-	private String clickInList(String[] arguments) {
-		String command = "the command  clickInList(" + arguments[0] + ")";
+	private String clickOnButton(JSONArray params) {
+		String command = "the command  clickOnButton";
 		try {
-			solo.clickInList(Integer.parseInt(arguments[0]));
+			command +="(" + params.getString(0) + ")";
+			solo.clickOnButton(params.getInt(0));
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
+		}catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command;
-
 	}
 
-	private String clickOnButton(String[] params) {
-		String command = "the command  clickOnButton(" + params[0] + ")";
+	private String enterText(JSONArray params) {
+		String command = "the command  clickOnButton";
 		try {
-
-			solo.clickOnButton(Integer.parseInt(params[0]));
+			command +="(" + params.getString(0) + ")";
+			solo.enterText(params.getInt(0), params.getString(1));
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
-		}
-		return SUCCESS_STRING + command;
-	}
-
-	private String enterText(String[] params) {
-		String command = "the command  clickOnButton(" + params[0] + ")";
-		try {
-			solo.enterText(Integer.parseInt(params[0]), params[1]);
-		} catch (Error e) {
+		}catch (JSONException e){
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
-			return error;
 		}
 		return SUCCESS_STRING + command;
 
 	}
 
-	private String clickOnText(String[] params) {
-		String command = "the command clickOnText(" + params[0] + ")";
+	private String clickOnText(JSONArray params) {
+		String command = "the command clickOnText";
 		try {
-			solo.clickOnText(params[0]);
+			command+="(" + params.getString(0) + ")";
+			solo.clickOnText(params.getString(0) );
 
 		} catch (Error e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return error;
+		}catch (JSONException e){
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
 		}
 		return SUCCESS_STRING + command;
 
 	}
-	private String clickOnHardware(String[] keyString){
-		int key = (keyString[0] == "HOME" )? KeyEvent.KEYCODE_HOME : KeyEvent.KEYCODE_BACK;
-		instrumentation.sendKeyDownUpSync(key);
+	private String clickOnHardware(JSONArray keyString){
+		String command = "the command clickOnHardware";
+		try {
+			command+="("+keyString.getString(0)+")";
+			int key = (keyString.getString(0) == "HOME" )? KeyEvent.KEYCODE_HOME : KeyEvent.KEYCODE_BACK;
+			instrumentation.sendKeyDownUpSync(key);
+		} catch (Error e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
+			return error;
+		}catch (JSONException e){
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
+		}
 		return SUCCESS_STRING + "click on hardware";
 	}
 

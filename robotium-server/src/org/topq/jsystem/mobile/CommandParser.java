@@ -2,33 +2,28 @@ package org.topq.jsystem.mobile;
 
 import java.util.Arrays;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.util.Log;
+
 public class CommandParser {
 
-	private static final String ARGS_DELIMITER = ",";
-	private final String command;
-	private final String[] arguments;
+	private static final String TAG = "CommandParser";
+	private  JSONObject command;
 
-	public CommandParser(final String data) {
-		String[] cmds = data.split(ARGS_DELIMITER);
-		command = cmds[0].trim();
-		if (cmds.length == 1) {
-			arguments = new String[0];
-			return;
-		}
-		arguments = removeFirstElement(cmds);
-	}
-	
-
-	private static String[] removeFirstElement(String[] commandParts) {
-		return Arrays.copyOfRange(commandParts, 1, commandParts.length);
+	public CommandParser(final String data) throws JSONException{
+		Log.d(TAG, "Pars command: " + data);
+		 command = new JSONObject(data);
 	}
 
-	public String getCommand() {
-		return command;
+	public String getCommand() throws JSONException {
+		return command.getString("Command");
 	}
 
-	public String[] getArguments() {
-		return arguments;
+	public JSONArray getArguments() throws JSONException {
+		return (JSONArray) command.get("Params");
 	}
 
 }
