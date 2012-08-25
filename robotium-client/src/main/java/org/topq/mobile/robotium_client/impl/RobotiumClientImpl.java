@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
 import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.core.AdbController;
@@ -30,6 +31,7 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	private static String testClassName = null;
 	private static String host = null;
 	private static String testName = null;
+	private static final String RESULT_STRING ="RESULT";
 	
 	public RobotiumClientImpl(String configFile,boolean doDeply) throws Exception{
 		logger = Logger.getLogger(RobotiumClientImpl.class);
@@ -81,23 +83,28 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	 *            serialised JSON object
 	 * @throws Exception
 	 */
-	public String sendData(final String data) throws Exception {
-		logger.info("Sending command: " + data);
-		String result = null;
+	public String sendData(String command,String... params) throws Exception {
+		JSONObject jsonobj = new JSONObject();
+		String resultValue;
+		jsonobj.put("Command", command);
+		jsonobj.put("Params", params);
+		logger.info("Sending command: " + jsonobj.toString());
+		JSONObject result = null;
 		IDevice device = getDevice();
 		logger.info("Send Data to " + device.getSerialNumber());
 
 		try {
-			result = tcpClient.sendData(data);
-			int splitIndex = result.indexOf("{");
-			if (splitIndex == -1) {
+			result =  new JSONObject(tcpClient.sendData(jsonobj));
+			
+			if (result.isNull(RESULT_STRING)) {
 				logger.error("No data recieved from the device");
 				return NO_DATA_STRING;
 			}
-			if (result.contains(ERROR_STRING)) {
+			 resultValue = (String) result.get(RESULT_STRING);
+			if (resultValue.contains(ERROR_STRING)) {
 				logger.error(result);
 				adb.getScreenShots(getDevice());
-			} else if (result.contains(SUCCESS_STRING)) {
+			} else if (resultValue.contains(SUCCESS_STRING)) {
 				logger.info(result);
 			}
 
@@ -108,79 +115,76 @@ public class RobotiumClientImpl implements MobileClintInterface{
 		if (getScreenshots) {
 			adb.getScreenShots(getDevice());
 		}
-		return result;
+		return resultValue;
 	}
 
 
 	public String launch() throws Exception {
-		return sendData("{launch;}");
+		return sendData("launch");
 		
 	}
 
 	public String getTextView(int index) throws Exception {
-		return sendData("{getTextView," + index + ";}");
+		return sendData("getTextView",Integer.toString(index));
 	}
 
 	public String getTextViewIndex(String text) throws Exception {
-		String response = sendData("{getTextViewIndex," + text + ";}");
+		String response = sendData("getTextViewIndex",text);
 		return response;
 	}
 
 	public String getCurrentTextViews() throws Exception {
-		return sendData("{getCurrentTextViews,a;}");
+		return sendData("getCurrentTextViews","a");
 	}
 
 	public String getText(int index) throws Exception {
-		return sendData("{getText," + index + ";}");
+		return sendData("getText",Integer.toString(index));
 	}
 
 	public String clickOnMenuItem(String item) throws Exception {
-		return sendData("{clickOnMenuItem," + item + ";}");
+		return sendData("clickOnMenuItem",item);
 	}
 
 	public String  clickOnView(int index) throws Exception {
-		return sendData("{clickOnView," + index + ";}");
+		return sendData("clickOnView",Integer.toString(index));
 	}
 
 	public String enterText(int index, String text) throws Exception {
-		return sendData("{enterText," + index + "," + text + ";}");
+		return sendData("enterText",Integer.toString(index),text);
 	}
 
 	public String clickOnButton(int index) throws Exception {
-		return sendData("{clickOnButton," + index + ";}");
+		return sendData("clickOnButton",Integer.toString(index));
 	}
 
 	public String clickInList(int index) throws Exception {
-		return sendData("{clickInList," + index + ";}");
+		return sendData("clickInList",Integer.toString(index));
 	}
 
 	public String clearEditText(int index) throws Exception {
-		return sendData("{clearEditText," + index + ";}");
+		return sendData("clearEditText",Integer.toString(index));
 	}
 
 	public String clickOnButtonWithText(String text) throws Exception {
-		return sendData("{clickOnButtonWithText," + text + ";}");
+		return sendData("clickOnButtonWithText",text);
 	}
 
 	public String clickOnText(String text) throws Exception {
-		return sendData("{clickOnText," + text + ";}");
+		return sendData("clickOnText",text);
 	}
 	@Override
 	public String clickOnHardwereButton(HardwareButtons button)
 			throws Exception {
-		return sendData("{clickOnHardware,"+button.name()+";}");
+		return sendData("clickOnHardware",button.name());
 	}
 
-	public String goBack() throws Exception {
-		return sendData("{goBack,;}");
-	}
 
 	public String sendKey(int key) throws Exception {
-		return sendData("{sendKey," + key + ";}");
+		return sendData("sendKey",Integer.toString(key));
 	}
 
 	public void closeConnection() throws Exception {
-		sendData("{GodBay;}");
+		sendData("GodBay");
 		tcpClient.closeConnection();
 
 	}
