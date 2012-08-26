@@ -28,7 +28,6 @@ public class FrankClientImpl implements MobileClintInterface {
 	public FrankClientImpl(String fileName){
 		configuration = new Configuration();
 		LoadProperties.fromFiles(fileName).into(configuration);
-
 		Victor victor = new Victor(configuration);
 		application = victor.application();
 		logger = Logger.getLogger(FrankClientImpl.class);
@@ -121,6 +120,12 @@ public class FrankClientImpl implements MobileClintInterface {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public void openObjectSpy() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	private String sendMessage(String uiQueryPatern, String command,Object... arguments) {
 		CharSequence result = sendMessageWithRespons(uiQueryPatern, command,arguments);
@@ -151,6 +156,5 @@ public class FrankClientImpl implements MobileClintInterface {
 	private String sendMassageWithMarkerAsInt(String view, int marker,String command, Object... arguments) {
 		return sendMessage(view +" tag:"+Integer.toString(marker), command, arguments);
 	}
-
 
 }

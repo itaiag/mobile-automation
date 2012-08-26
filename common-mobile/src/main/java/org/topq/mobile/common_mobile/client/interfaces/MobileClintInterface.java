@@ -44,6 +44,9 @@ public interface MobileClintInterface {
 	public String clickOnHardwereButton(HardwareButtons button) throws Exception;
 	
 	public String sendKey(int key) throws Exception;
+
+	public void openObjectSpy() throws Exception; 
 	
 	public void closeConnection() throws Exception;
+
 }

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
 import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
@@ -83,18 +84,10 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	 *            serialised JSON object
 	 * @throws Exception
 	 */
-	public String sendData(String command,String... params) throws Exception {
-		JSONObject jsonobj = new JSONObject();
+	public String sendData(String command,String... params) throws Exception {	
 		String resultValue;
-		jsonobj.put("Command", command);
-		jsonobj.put("Params", params);
-		logger.info("Sending command: " + jsonobj.toString());
-		JSONObject result = null;
-		IDevice device = getDevice();
-		logger.info("Send Data to " + device.getSerialNumber());
-
 		try {
-			result =  new JSONObject(tcpClient.sendData(jsonobj));
+			JSONObject result =  sendDataAndGetJSonObj(command, params);
 			
 			if (result.isNull(RESULT_STRING)) {
 				logger.error("No data recieved from the device");
@@ -117,58 +110,76 @@ public class RobotiumClientImpl implements MobileClintInterface{
 		}
 		return resultValue;
 	}
+	
+	public JSONObject sendDataAndGetJSonObj(String command,String... params) throws Exception{
+		JSONObject jsonobj = new JSONObject();
+		jsonobj.put("Command", command);
+		jsonobj.put("Params", params);
+		logger.info("Sending command: " + jsonobj.toString());
+		JSONObject result = null;
+		IDevice device = getDevice();
+		logger.info("Send Data to " + device.getSerialNumber());
 
+		try {
+			result =  new JSONObject(tcpClient.sendData(jsonobj));
+		} catch (Exception e) {
+			logger.error("Failed to send / receive data", e);
+			throw e;
+		} 
+		return result;	
+	}
 
+	@Override
 	public String launch() throws Exception {
 		return sendData("launch");
 		
 	}
-
+	@Override
 	public String getTextView(int index) throws Exception {
 		return sendData("getTextView",Integer.toString(index));
 	}
-
+	@Override
 	public String getTextViewIndex(String text) throws Exception {
 		String response = sendData("getTextViewIndex",text);
 		return response;
 	}
-
+	@Override
 	public String getCurrentTextViews() throws Exception {
 		return sendData("getCurrentTextViews","a");
 	}
-
+	@Override
 	public String getText(int index) throws Exception {
 		return sendData("getText",Integer.toString(index));
 	}
-
+	@Override
 	public String clickOnMenuItem(String item) throws Exception {
 		return sendData("clickOnMenuItem",item);
 	}
-
+	@Override
 	public String  clickOnView(int index) throws Exception {
 		return sendData("clickOnView",Integer.toString(index));
 	}
-
+	@Override
 	public String enterText(int index, String text) throws Exception {
 		return sendData("enterText",Integer.toString(index),text);
 	}
-
+	@Override
 	public String clickOnButton(int index) throws Exception {
 		return sendData("clickOnButton",Integer.toString(index));
 	}
-
+	@Override
 	public String clickInList(int index) throws Exception {
 		return sendData("clickInList",Integer.toString(index));
 	}
-
+	@Override
 	public String clearEditText(int index) throws Exception {
 		return sendData("clearEditText",Integer.toString(index));
 	}
-
+	@Override
 	public String clickOnButtonWithText(String text) throws Exception {
 		return sendData("clickOnButtonWithText",text);
 	}
-
+	@Override
 	public String clickOnText(String text) throws Exception {
 		return sendData("clickOnText",text);
 	}
@@ -178,11 +189,17 @@ public class RobotiumClientImpl implements MobileClintInterface{
 		return sendData("clickOnHardware",button.name());
 	}
 
-
+	@Override
 	public String sendKey(int key) throws Exception {
 		return sendData("sendKey",Integer.toString(key));
 	}
-
+	
+	@Override
+	public void openObjectSpy() throws Exception {
+			JSONObject allViews = sendDataAndGetJSonObj("getAllView");
+			logger.error(allViews.toString());
+	}
+	@Override
 	public void closeConnection() throws Exception {
 		sendData("GodBay");
 		tcpClient.closeConnection();
@@ -196,7 +213,6 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	public void setAdb(AdbController adb) {
 		this.adb = adb;
 	}
-	
 
 	private void setPortForwarding() throws Exception {
 		IDevice device = getDevice();
@@ -218,7 +234,5 @@ public class RobotiumClientImpl implements MobileClintInterface{
 		}
 		return device;
 	}
-
-
 
 }

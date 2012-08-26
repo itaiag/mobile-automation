@@ -1,5 +1,6 @@
 package org.topq.jsystem.mobile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -9,6 +10,9 @@ import org.json.JSONObject;
 import android.app.Instrumentation;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jayway.android.robotium.solo.Solo;
@@ -39,15 +43,15 @@ public class SoloExecutor {
 				result.put(RESULT_STRING,SUCCESS_STRING + "Mock tests");
 			}
 			if (command.getCommand().equals("enterText")) {
-				result.put(RESULT_STRING,command.getArguments());
+				result.put(RESULT_STRING,enterText(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnButton")) {
-				result.put(RESULT_STRING,command.getArguments());
+				result.put(RESULT_STRING,clickOnButton(command.getArguments()));
 			} else if (command.getCommand().equals("launch")) {
 				result.put(RESULT_STRING,launch());
 			} else if (command.getCommand().equals("clickInList")) {
 				result.put(RESULT_STRING,clickInList(command.getArguments()));
 			} else if (command.getCommand().equals("clearEditText")) {
-				result.put(RESULT_STRING,command.getArguments());
+				result.put(RESULT_STRING,clearEditText(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnButtonWithText")) {
 				result.put(RESULT_STRING,clickOnButtonWithText(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnView")) {
@@ -69,6 +73,8 @@ public class SoloExecutor {
 			} else if (command.getCommand().equals("clickOnHardware")) {
 				result.put(RESULT_STRING,clickOnHardware(command.getArguments()));
 			
+			}else if(command.getCommand().equals("getAllView")){
+				return getAllView();
 			}
 		}
 	
@@ -335,6 +341,30 @@ public class SoloExecutor {
 		}
 		return SUCCESS_STRING + command;
 
+	}
+	
+	private JSONObject getAllView() throws JSONException{
+		ArrayList<View> allViews = solo.getViews();
+		Log.d(TAG, "Size of allViews is:"+allViews.size());
+		JSONObject jsonAllViews = new JSONObject();
+		int i =0;
+		List<Integer> viewsId = new ArrayList<Integer>();
+		for(View view : allViews){
+			JSONArray jsonView = new JSONArray();
+			int id = view.getId();
+			if(!viewsId.contains(id) && view.isShown()){
+				viewsId.add(id);
+				jsonView.put(view.getClass());
+				jsonView.put(id);
+				jsonView.put(view.getTag());
+				if(view instanceof TextView){
+					jsonView.put(((TextView) view).getText());
+				}
+				jsonAllViews.put("AllShonViews"+i,jsonView);
+				i++;
+			}
+		}
+		return jsonAllViews;
 	}
 
 }
