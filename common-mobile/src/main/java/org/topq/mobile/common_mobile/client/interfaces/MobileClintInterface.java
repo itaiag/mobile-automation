@@ -53,5 +53,5 @@ public interface MobileClintInterface {
 	
 	public String createFileInServer(String path, String data) throws Exception;
 	
-	public File pull(String fileName) throws Exception;
+	public File pull(String fileName,String newlocalFileName) throws Exception;
 }
