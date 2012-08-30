@@ -79,7 +79,7 @@ public class SoloExecutor {
 			}else if(command.getCommand().equals("createFileInServer")){
 				result.put(RESULT_STRING,createFileInServer(command.getArguments()));
 			}else if(command.getCommand().equals("pull")){
-				result.put(RESULT_STRING,pull(command.getArguments()));
+				return pull(command.getArguments());
 			}
 		}
 	
@@ -105,7 +105,8 @@ public class SoloExecutor {
 			{     
 				allText+=line;
 			} 
-			result =  new JSONObject(allText);
+			result =  new JSONObject();
+			result.put("file", allText);
 		} catch (IOException e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
