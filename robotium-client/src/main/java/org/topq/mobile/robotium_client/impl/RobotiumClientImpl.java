@@ -1,7 +1,9 @@
 package org.topq.mobile.robotium_client.impl;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -198,10 +200,20 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	}
 
 	@Override
-	public File pull(String fileName) throws Exception {
+	public File pull(String fileName,String newlocalFileName) throws Exception {
 		JSONObject jsonObj = sendDataAndGetJSonObj("pull",fileName);
-		logger.info(jsonObj);
-		return null;
+		try{
+			// Create file 
+			FileWriter fstream = new FileWriter(newlocalFileName);
+			BufferedWriter out = new BufferedWriter(fstream);
+			out.write(jsonObj.getString("file"));
+			//Close the output stream
+			out.close();
+		}catch (Exception e){//Catch exception if any
+			logger.error("Failed to get file "+fileName, e);
+			throw e;
+		}
+		return new File(newlocalFileName);
 	}
 
 	public String sendKey(int key) throws Exception {
