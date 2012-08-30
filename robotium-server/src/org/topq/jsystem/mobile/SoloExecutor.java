@@ -1,5 +1,9 @@
 package org.topq.jsystem.mobile;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -7,6 +11,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Instrumentation;
+import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.TextView;
@@ -65,6 +71,8 @@ public class SoloExecutor {
 			} else if (command.getCommand().equals("clickOnHardware")) {
 				result.put(RESULT_STRING,clickOnHardware(command.getArguments()));
 			
+			}else if(command.getCommand().equals("createFileInServer")){
+				result.put(RESULT_STRING,createFileInServer(command.getArguments()));
 			}
 		}
 	
@@ -72,6 +80,31 @@ public class SoloExecutor {
 
 	}
 
+
+	private Object createFileInServer(JSONArray arguments) {
+		String command = "the command  push";
+		try {
+			command+="(" + arguments.getString(0) +", "+arguments.getString(1)+")";
+			if(arguments.getBoolean(2)){
+				FileOutputStream fos = new FileOutputStream(arguments.getString(0));
+				fos.write(Base64.decode(arguments.getString(1),Base64.DEFAULT));
+				fos.close();
+			}else{
+				FileWriter out = new FileWriter(new File(arguments.getString(0)));
+				out.write(arguments.getString(1));
+				out.close();
+			}
+		} catch (IOException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
+			return error;
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
+			return error;
+		}
+		return SUCCESS_STRING + command;
+	}
 
 	private String getCurrentTextViews(JSONArray arguments) {
 		String command = "the command  getCurrentTextViews";
