@@ -1,9 +1,14 @@
 package org.topq.jsystem.mobile;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -35,7 +40,7 @@ public class SoloExecutor {
 		this.instrumentation = instrumentation;
 	}
 
-	public JSONObject execute(final String data) throws JSONException  {
+	public JSONObject execute(final String data) throws JSONException, IOException  {
 		ScriptParser parser;
 		JSONObject result = new JSONObject();
 			parser = new ScriptParser(data);
@@ -73,6 +78,8 @@ public class SoloExecutor {
 			
 			}else if(command.getCommand().equals("createFileInServer")){
 				result.put(RESULT_STRING,createFileInServer(command.getArguments()));
+			}else if(command.getCommand().equals("pull")){
+				result.put(RESULT_STRING,pull(command.getArguments()));
 			}
 		}
 	
@@ -81,7 +88,40 @@ public class SoloExecutor {
 	}
 
 
-	private Object createFileInServer(JSONArray arguments) {
+	private JSONObject  pull(JSONArray arguments) throws IOException {
+		String command = "the command  push";
+		String allText ="";
+		JSONObject result = null;
+		DataInputStream in = null;
+		FileInputStream fstream = null;
+		try {
+			command+="(" + arguments.getString(0)+")";
+			 fstream = new FileInputStream(arguments.getString(0));
+			// Get the object of DataInputStream
+			 in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String line; 
+			while ((line = br.readLine()) != null) 
+			{     
+				allText+=line;
+			} 
+			result =  new JSONObject(allText);
+		} catch (IOException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
+			
+		} catch (JSONException e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
+			return null;
+		}finally{
+			in.close();
+			fstream.close();
+		}
+		return result;
+	}
+
+	private String createFileInServer(JSONArray arguments) {
 		String command = "the command  push";
 		try {
 			command+="(" + arguments.getString(0) +", "+arguments.getString(1)+")";

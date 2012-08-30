@@ -14,6 +14,7 @@ import org.topq.mobile.core.GeneralEnums;
 import org.topq.mobile.robotium_client.infrastructure.AdbTcpClient;
 
 import com.android.ddmlib.IDevice;
+import com.android.ddmlib.Log;
 
 
 public class RobotiumClientImpl implements MobileClintInterface{
@@ -198,7 +199,8 @@ public class RobotiumClientImpl implements MobileClintInterface{
 
 	@Override
 	public File pull(String fileName) throws Exception {
-		
+		JSONObject jsonObj = sendDataAndGetJSonObj("pull",fileName);
+		logger.info(jsonObj);
 		return null;
 	}
 
