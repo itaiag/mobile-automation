@@ -1,5 +1,7 @@
 package org.topq.mobile.common_mobile.client.interfaces;
 
+import java.io.File;
+
 import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
 
 /**
@@ -46,4 +48,10 @@ public interface MobileClintInterface {
 	public String sendKey(int key) throws Exception;
 	
 	public void closeConnection() throws Exception;
+	
+	public String createFileInServer(String path,byte[]  data) throws Exception;
+	
+	public String createFileInServer(String path, String data) throws Exception;
+	
+	public File pull(String fileName) throws Exception;
 }
