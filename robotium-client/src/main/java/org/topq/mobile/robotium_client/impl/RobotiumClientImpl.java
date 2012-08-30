@@ -73,7 +73,6 @@ public class RobotiumClientImpl implements MobileClintInterface{
 		}
 	}
 	
-	
 	/**
 	 * Send data using the TCP connection & wait for response Parse the response
 	 * (make conversions if necessary - pixels to mms) and report
@@ -83,18 +82,10 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	 *            serialised JSON object
 	 * @throws Exception
 	 */
-	public String sendData(String command,String... params) throws Exception {
-		JSONObject jsonobj = new JSONObject();
+	public String sendData(String command,String... params) throws Exception {	
 		String resultValue;
-		jsonobj.put("Command", command);
-		jsonobj.put("Params", params);
-		logger.info("Sending command: " + jsonobj.toString());
-		JSONObject result = null;
-		IDevice device = getDevice();
-		logger.info("Send Data to " + device.getSerialNumber());
-
 		try {
-			result =  new JSONObject(tcpClient.sendData(jsonobj));
+			JSONObject result =  sendDataAndGetJSonObj(command, params);
 			
 			if (result.isNull(RESULT_STRING)) {
 				logger.error("No data recieved from the device");
@@ -116,6 +107,24 @@ public class RobotiumClientImpl implements MobileClintInterface{
 			adb.getScreenShots(getDevice());
 		}
 		return resultValue;
+	}
+	
+	public JSONObject sendDataAndGetJSonObj(String command,String... params) throws Exception{
+		JSONObject jsonobj = new JSONObject();
+		jsonobj.put("Command", command);
+		jsonobj.put("Params", params);
+		logger.info("Sending command: " + jsonobj.toString());
+		JSONObject result = null;
+		IDevice device = getDevice();
+		logger.info("Send Data to " + device.getSerialNumber());
+
+		try {
+			result =  new JSONObject(tcpClient.sendData(jsonobj));
+		} catch (Exception e) {
+			logger.error("Failed to send / receive data", e);
+			throw e;
+		} 
+		return result;	
 	}
 
 
@@ -178,6 +187,20 @@ public class RobotiumClientImpl implements MobileClintInterface{
 		return sendData("clickOnHardware",button.name());
 	}
 
+	@Override
+	public String createFileInServer(String path, String data) throws Exception {
+		return sendData("createFileInServer",path,data,"false");
+	}
+	@Override
+	public String createFileInServer(String path, byte[] data) throws Exception {
+		return sendData("createFileInServer",path,new String(data),"true");
+	}
+
+	@Override
+	public File pull(String fileName) throws Exception {
+		
+		return null;
+	}
 
 	public String sendKey(int key) throws Exception {
 		return sendData("sendKey",Integer.toString(key));
