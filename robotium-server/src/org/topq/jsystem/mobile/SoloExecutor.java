@@ -89,7 +89,7 @@ public class SoloExecutor {
 
 
 	private JSONObject  pull(JSONArray arguments) throws IOException {
-		String command = "the command  push";
+		String command = "the command  pull";
 		String allText ="";
 		JSONObject result = null;
 		DataInputStream in = null;
@@ -123,12 +123,14 @@ public class SoloExecutor {
 	}
 
 	private String createFileInServer(JSONArray arguments) {
-		String command = "the command  push";
+		String command = "the command  createFileInServer";
 		try {
-			command+="(" + arguments.getString(0) +", "+arguments.getString(1)+")";
+			command+="(" + arguments.getString(0) +", "+Base64.decode(arguments.getString(1),Base64.URL_SAFE)+")";
+			Log.d(TAG,"run the command:"+command);
 			if(arguments.getBoolean(2)){
+				Log.d(TAG,"Creating file with the data "+Base64.decode(arguments.getString(1),Base64.URL_SAFE));
 				FileOutputStream fos = new FileOutputStream(arguments.getString(0));
-				fos.write(Base64.decode(arguments.getString(1),Base64.DEFAULT));
+				fos.write(Base64.decode(arguments.getString(1),Base64.URL_SAFE));
 				fos.close();
 			}else{
 				FileWriter out = new FileWriter(new File(arguments.getString(0)));
