@@ -19,10 +19,12 @@ public class CommandParser {
 	}
 
 	public String getCommand() throws JSONException {
+		Log.d(TAG, "command is:" + command.getString("Command"));
 		return command.getString("Command");
 	}
 
 	public JSONArray getArguments() throws JSONException {
+		Log.d(TAG, "Params are:" +  command.get("Params"));
 		return (JSONArray) command.get("Params");
 	}
 
