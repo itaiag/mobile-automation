@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.Properties;
 
+import net.iharder.Base64;
+
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
@@ -196,7 +198,7 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	}
 	@Override
 	public String createFileInServer(String path, byte[] data) throws Exception {
-		return sendData("createFileInServer",path,new String(data),"true");
+		return sendData("createFileInServer",path,Base64.encodeBytes(data,Base64.URL_SAFE),"true");
 	}
 
 	@Override
