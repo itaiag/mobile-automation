@@ -107,6 +107,8 @@ public class SoloExecutor {
 			} 
 			result =  new JSONObject();
 			result.put("file", allText);
+			in.close();
+			fstream.close();
 		} catch (IOException e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
@@ -115,9 +117,6 @@ public class SoloExecutor {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
 			return null;
-		}finally{
-			in.close();
-			fstream.close();
 		}
 		return result;
 	}
@@ -125,19 +124,20 @@ public class SoloExecutor {
 	private String createFileInServer(JSONArray arguments) {
 		String command = "the command  createFileInServer";
 		try {
-			byte[] data = Base64.decode(arguments.getString(1),Base64.URL_SAFE);
-			command+="(" + arguments.getString(0) +", "+data+")";
-			Log.d(TAG,"run the command:"+command);
 			if(arguments.getBoolean(2)){
-				Log.d(TAG,"Creating file with the data "+data);
+				byte[] data = Base64.decode(arguments.getString(1),Base64.URL_SAFE);
+				command+="(" + arguments.getString(0) +", "+data+")";
+				command+="(" + arguments.getString(0) +", "+data+")";
 				FileOutputStream fos = new FileOutputStream(arguments.getString(0));
 				fos.write(data);
 				fos.close();
 			}else{
+				command+="(" + arguments.getString(0) +", "+arguments.getString(1)+")";
 				FileWriter out = new FileWriter(arguments.getString(0));
 				out.write(arguments.getString(1));
 				out.close();
 			}
+			Log.d(TAG,"run the command:"+command);
 		} catch (IOException e) {
 			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
 			Log.d(TAG, error);
