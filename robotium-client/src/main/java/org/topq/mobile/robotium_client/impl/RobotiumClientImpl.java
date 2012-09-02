@@ -1,15 +1,21 @@
 package org.topq.mobile.robotium_client.impl;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
 
 import net.iharder.Base64;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
 import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
@@ -193,29 +199,36 @@ public class RobotiumClientImpl implements MobileClintInterface{
 	}
 
 	@Override
-	public String createFileInServer(String path, String data) throws Exception {
-		return sendData("createFileInServer",path,data,"false");
-	}
-	@Override
-	public String createFileInServer(String path, byte[] data) throws Exception {
-		return sendData("createFileInServer",path,Base64.encodeBytes(data,Base64.URL_SAFE),"true");
+	public byte[] pull(String fileName) throws Exception {
+		JSONObject jsonObj = sendDataAndGetJSonObj("pull",fileName);
+		logger.info("command pull receved" + jsonObj);
+		return ((jsonObj.getString("file"))).getBytes("UTF-16LE");
 	}
 
+	
 	@Override
-	public File pull(String fileName,String newlocalFileName) throws Exception {
-		JSONObject jsonObj = sendDataAndGetJSonObj("pull",fileName);
-		try{
-			// Create file 
-			FileWriter fstream = new FileWriter(newlocalFileName);
-			BufferedWriter out = new BufferedWriter(fstream);
-			out.write(jsonObj.getString("file"));
-			//Close the output stream
-			out.close();
-		}catch (Exception e){//Catch exception if any
-			logger.error("Failed to get file "+fileName, e);
-			throw e;
+	public String push(String fileName, String newlocalFileName) throws Exception {
+		String result;
+		
+		File file = new File(fileName);
+		BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+		int size = (int) file.length();
+		byte[] buffer = new byte[(int) file.length()];
+		
+		try {
+			int n = in.read(buffer, 0, size);
+			while (n >= 0) {
+				System.out.write(buffer, 0, n);
+				n = in.read(buffer, 0, size);
+			}
 		}
-		return new File(newlocalFileName);
+		finally { // always close input stream
+			in.close();
+		}
+		
+		
+		result =sendData("createFileInServer",newlocalFileName,Base64.encodeBytes(buffer,Base64.URL_SAFE),"true");
+		return result;
 	}
 
 	public String sendKey(int key) throws Exception {
@@ -257,6 +270,7 @@ public class RobotiumClientImpl implements MobileClintInterface{
 		}
 		return device;
 	}
+
 
 
 
