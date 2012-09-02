@@ -48,10 +48,8 @@ public interface MobileClintInterface {
 	public String sendKey(int key) throws Exception;
 	
 	public void closeConnection() throws Exception;
+
+	public byte[] pull(String fileName) throws Exception;
 	
-	public String createFileInServer(String path,byte[]  data) throws Exception;
-	
-	public String createFileInServer(String path, String data) throws Exception;
-	
-	public File pull(String fileName,String newlocalFileName) throws Exception;
+	public String push(String fileName,String newlocalFileName) throws Exception;
 }
