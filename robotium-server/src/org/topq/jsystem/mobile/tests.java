@@ -3,14 +3,14 @@ package org.topq.jsystem.mobile;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.jayway.android.robotium.solo.Solo;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
+
+import com.jayway.android.robotium.solo.Solo;
 
 public class tests extends ActivityInstrumentationTestCase2 {
 	private static final String TAG = "ANDROID CLIENT";
@@ -18,7 +18,7 @@ public class tests extends ActivityInstrumentationTestCase2 {
 	private static final String TARGET_PACKAGE_ID = "com.gettaxi";
 	private static final String LAUNCHER_ACTIVITY_FULL_CLASSNAME = "com.gettaxi.android.activities.login.LoadingActivity";
 	private static Class launcherActivityClass;
-	
+
 	static {
 
 		try {
