@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.topq.mobile</groupId>
+	<artifactId>parent.mobile-automation</artifactId>
+	<packaging>pom</packaging>
+	<name>Parent mobile</name>
+	<version>0.0.1-SNAPSHOT</version>
+	<modules>
+		<module>../AdbController</module>
+		<module>../common-mobile</module>
+		<module>../frank-client</module>
+		<module>../robotium-client</module>		
+	</modules>
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<url>http://80.74.108.9/content/groups/public</url>
+		</repository>
+	</repositories>
+</project>
