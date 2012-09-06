@@ -10,8 +10,8 @@ import net.schmizz.sshj.xfer.FileSystemFile;
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer;
 
 import org.apache.log4j.Logger;
+import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.frank_client.imp.FrankClientImpl;
-import org.topq.mobile.frank_client.interfaces.FrankClient;
 
 import com.dhemery.configuring.Configuration;
 import com.dhemery.victor.IosDevice;
@@ -89,10 +89,10 @@ public class SshIosDevice implements IosDevice{
 		Command cmd =session.exec(totalCommand);
 		cmd.join(30, TimeUnit.SECONDS);
 		if(IOUtils.readFully(cmd.getInputStream()).toString().contains("Error") || IOUtils.readFully(cmd.getInputStream()).toString().contains("FAIELD")||cmd.getExitStatus()!= 0){
-			lestResult = FrankClient.ERROR_STRING;
+			lestResult = MobileClintInterface.ERROR_STRING;
 			throw new Exception("The command "+totalCommand+"FAIELD!\nOutput:"+IOUtils.readFully(cmd.getInputStream()).toString()+"\nExit Status:"+cmd.getExitStatus());
 		}
-		lestResult = FrankClient.SUCCESS_STRING;
+		lestResult = MobileClintInterface.SUCCESS_STRING;
 
 	}
 

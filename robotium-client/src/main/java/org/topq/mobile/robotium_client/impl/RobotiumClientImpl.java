@@ -6,20 +6,19 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
+import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.core.AdbController;
 import org.topq.mobile.core.GeneralEnums;
 import org.topq.mobile.robotium_client.infrastructure.AdbTcpClient;
-import org.topq.mobile.robotium_client.interfaces.RobotiumClient;
 
 import com.android.ddmlib.IDevice;
 
+public class RobotiumClientImpl implements MobileClintInterface {
 
-public class RobotiumClientImpl implements RobotiumClient{
-	
-	
 	private AdbTcpClient tcpClient;
 	private static AdbController adb;
-	private static Logger logger= null;
+	private static Logger logger = null;
 	private static boolean getScreenshots = false;
 	private static int port = 6100;
 	private static String deviceSerial;
@@ -28,48 +27,47 @@ public class RobotiumClientImpl implements RobotiumClient{
 	private static String testClassName = null;
 	private static String host = null;
 	private static String testName = null;
-	
-	public RobotiumClientImpl(String configFile,boolean doDeply) throws Exception{
+
+	public RobotiumClientImpl(String configFile, boolean doDeply) throws Exception {
 		logger = Logger.getLogger(RobotiumClientImpl.class);
 		File file = new File(configFile);
-		if(file.exists()){
-		Properties pro = new Properties();
-		InputStream in = new FileInputStream(file);
-		pro.load(in);
-		String temeroryProrp = pro.getProperty("Port");
-		logger.debug("In Properties file port is:"+temeroryProrp);
-		port = Integer.parseInt(temeroryProrp);
-		temeroryProrp = pro.getProperty("DeviceSerail");
-		logger.debug("In Properties file DeviceSerial is:"+temeroryProrp);
-		apkLocation = temeroryProrp;
-		temeroryProrp = pro.getProperty("ApkLocation");
-		logger.debug("APK location is:"+apkLocation);
-		pakageName = pro.getProperty("PakageName");
-		logger.debug("Pakage Name is:"+pakageName);
-		testClassName = pro.getProperty("TestClassName");
-		logger.debug("Test Class Name is:"+testClassName);
-		testName = pro.getProperty("TestName");
-		logger.debug("Test  Name is:"+testName);
-		host = pro.getProperty("Host");
-		logger.debug("Host  Name is:"+host);
-		deviceSerial=pro.getProperty("DeviceSerail");
-		adb = new AdbController(deviceSerial);
-		String serverConfFileLocation = pro.getProperty("ServerConfFile");
-		if(doDeply){
-			adb.installAPK(serverConfFileLocation, temeroryProrp);
-		}
-		adb.runTestOnDevice(pakageName,testClassName,testName);
-		logger.info("Start server on device");
-		setPortForwarding();
-		tcpClient = new AdbTcpClient(host, port);
-		}else{
-			Exception e= new Exception("Can't fiend the file:"+file.getAbsolutePath());
-			logger.error("Can't fiend the file:"+file.getAbsolutePath());
+		if (file.exists()) {
+			Properties pro = new Properties();
+			InputStream in = new FileInputStream(file);
+			pro.load(in);
+			String temeroryProrp = pro.getProperty("Port");
+			logger.debug("In Properties file port is:" + temeroryProrp);
+			port = Integer.parseInt(temeroryProrp);
+			temeroryProrp = pro.getProperty("DeviceSerail");
+			logger.debug("In Properties file DeviceSerial is:" + temeroryProrp);
+			apkLocation = temeroryProrp;
+			temeroryProrp = pro.getProperty("ApkLocation");
+			logger.debug("APK location is:" + apkLocation);
+			pakageName = pro.getProperty("PakageName");
+			logger.debug("Pakage Name is:" + pakageName);
+			testClassName = pro.getProperty("TestClassName");
+			logger.debug("Test Class Name is:" + testClassName);
+			testName = pro.getProperty("TestName");
+			logger.debug("Test  Name is:" + testName);
+			host = pro.getProperty("Host");
+			logger.debug("Host  Name is:" + host);
+			deviceSerial = pro.getProperty("DeviceSerail");
+			adb = new AdbController(deviceSerial);
+			String serverConfFileLocation = pro.getProperty("ServerConfFile");
+			if (doDeply) {
+				adb.installAPK(serverConfFileLocation, temeroryProrp);
+			}
+			adb.runTestOnDevice(pakageName, testClassName, testName);
+			logger.info("Start server on device");
+			setPortForwarding();
+			tcpClient = new AdbTcpClient(host, port);
+		} else {
+			Exception e = new Exception("Can't fiend the file:" + file.getAbsolutePath());
+			logger.error("Can't fiend the file:" + file.getAbsolutePath());
 			throw e;
 		}
 	}
-	
-	
+
 	/**
 	 * Send data using the TCP connection & wait for response Parse the response
 	 * (make conversions if necessary - pixels to mms) and report
@@ -102,17 +100,16 @@ public class RobotiumClientImpl implements RobotiumClient{
 		} catch (Exception e) {
 			logger.error("Failed to send / receive data", e);
 			throw e;
-		} 
+		}
 		if (getScreenshots) {
 			adb.getScreenShots(getDevice());
 		}
 		return result;
 	}
 
-
 	public String launch() throws Exception {
 		return sendData("{launch;}");
-		
+
 	}
 
 	public String getTextView(int index) throws Exception {
@@ -136,7 +133,7 @@ public class RobotiumClientImpl implements RobotiumClient{
 		return sendData("{clickOnMenuItem," + item + ";}");
 	}
 
-	public String  clickOnView(int index) throws Exception {
+	public String clickOnView(int index) throws Exception {
 		return sendData("{clickOnView," + index + ";}");
 	}
 
@@ -164,6 +161,10 @@ public class RobotiumClientImpl implements RobotiumClient{
 		return sendData("{clickOnText," + text + ";}");
 	}
 
+	public String clickOnHardwereButton(HardwareButtons button) throws Exception {
+		return sendData("{clickOnHardware," + button.name() + ";}");
+	}
+
 	public String goBack() throws Exception {
 		return sendData("{goBack,;}");
 	}
@@ -177,7 +178,7 @@ public class RobotiumClientImpl implements RobotiumClient{
 		tcpClient.closeConnection();
 
 	}
-	
+
 	public AdbController getAdb() {
 		return adb;
 	}
@@ -188,15 +189,15 @@ public class RobotiumClientImpl implements RobotiumClient{
 
 	private void setPortForwarding() throws Exception {
 		IDevice device = getDevice();
-		if (device.getState() == IDevice.DeviceState.ONLINE){
+		if (device.getState() == IDevice.DeviceState.ONLINE) {
 			device.createForward(port, GeneralEnums.SERVERPORT);
-		}else{
+		} else {
 			Exception e = new Exception("Unable to perform port forwarding - " + deviceSerial + " is not online");
 			logger.error(e);
 			throw e;
 		}
 	}
-	
+
 	private IDevice getDevice() throws Exception {
 		IDevice device = adb.getDevice(deviceSerial);
 		if (null == device) {

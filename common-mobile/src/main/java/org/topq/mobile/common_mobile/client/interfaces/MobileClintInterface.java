@@ -1,18 +1,18 @@
-package org.topq.mobile.robotium_client.interfaces;
+package org.topq.mobile.common_mobile.client.interfaces;
+
+import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
+
 /**
  * 
  * @author Bortman Limor
  *
  */
-public interface RobotiumClient {
+public interface MobileClintInterface {
 	public static final CharSequence ERROR_STRING = "ERROR";
 	public static final CharSequence SUCCESS_STRING = "SUCCESS";
 	public static final String NO_DATA_STRING = "NO_DATA_FROM_SERVER";
 	
-//	public void connect() throws Exception ;
-	
-	
-	
+
 	public String launch() throws Exception;
 	
 	public String getTextView(int index) throws Exception ;
@@ -39,7 +39,9 @@ public interface RobotiumClient {
 	
 	public String clickOnText(String text) throws Exception;
 
-	public String goBack() throws Exception;
+//	public String goBack() throws Exception;
+	
+	public String clickOnHardwereButton(HardwareButtons button) throws Exception;
 	
 	public String sendKey(int key) throws Exception;
 	

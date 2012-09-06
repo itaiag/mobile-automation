@@ -1,10 +1,10 @@
 package org.topq.mobile.frank_client.imp;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.topq.mobile.frank_client.interfaces.FrankClient;
+import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
+import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.frank_ssh.SshIosDevice;
 
 import com.dhemery.configuring.Configuration;
@@ -13,14 +13,12 @@ import com.dhemery.victor.IosApplication;
 import com.dhemery.victor.IosDevice;
 import com.dhemery.victor.UIQuery;
 import com.dhemery.victor.Victor;
-import com.dhemery.publishing.*;
-import  com.dhemery.victor.Igor;
 /**
  * 
  * @author Bortman Limor
  * 
  */
-public class FrankClientImpl implements FrankClient {
+public class FrankClientImpl implements MobileClintInterface {
 
 	private static IosApplication application;
 	private static IosDevice device = null;
@@ -117,7 +115,12 @@ public class FrankClientImpl implements FrankClient {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+	@Override
+	public String clickOnHardwereButton(HardwareButtons button)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	private String sendMessage(String uiQueryPatern, String command,Object... arguments) {
 		CharSequence result = sendMessageWithRespons(uiQueryPatern, command,arguments);
@@ -148,5 +151,6 @@ public class FrankClientImpl implements FrankClient {
 	private String sendMassageWithMarkerAsInt(String view, int marker,String command, Object... arguments) {
 		return sendMessage(view +" tag:"+Integer.toString(marker), command, arguments);
 	}
+
 
 }

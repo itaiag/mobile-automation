@@ -80,9 +80,9 @@ public class RobotiumServer extends ActivityInstrumentationTestCase2 implements 
 		return new Solo(getInstrumentation(), getActivity());
 	}
 
-	private SoloExecutor getExecutor() {
-		if (executor == null) {
-			executor = new SoloExecutor(this);
+	private SoloExecutor getExecutor(){
+		if(executor == null){
+			executor = new SoloExecutor(this,getInstrumentation());
 		}
 		return executor;
 	}
