@@ -8,6 +8,7 @@ import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
  *
  */
 public interface MobileClintInterface {
+	
 	public static final CharSequence ERROR_STRING = "ERROR";
 	public static final CharSequence SUCCESS_STRING = "SUCCESS";
 	public static final String NO_DATA_STRING = "NO_DATA_FROM_SERVER";
