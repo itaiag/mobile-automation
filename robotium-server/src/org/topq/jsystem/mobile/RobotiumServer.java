@@ -1,5 +1,6 @@
 package org.topq.jsystem.mobile;
 
+import org.json.JSONObject;
 import org.topq.jsystem.util.ConfUtil;
 
 import android.test.ActivityInstrumentationTestCase2;
@@ -63,15 +64,17 @@ public class RobotiumServer extends ActivityInstrumentationTestCase2 implements 
 	}
 
 	@Override
-	public String dataReceived(String data) {
+	public JSONObject dataReceived(String data) {
 		Log.i(TAG, "Recieved data " + data);
 		try {
-			return "{" + getExecutor().execute(data) + "}";
+
+			return getExecutor().execute(data);
+
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to process data " + data, e);
 			e.printStackTrace();
 		}
-		return " ";
+		return new JSONObject();
 
 	}
 

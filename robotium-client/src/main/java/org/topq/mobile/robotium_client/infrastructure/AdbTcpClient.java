@@ -7,6 +7,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import org.json.JSONML;
+import org.json.JSONObject;
+
 /**
  * <b>ADB TCP Client</b><br>
  * Handles the TCP send / receive data
@@ -31,7 +34,7 @@ public class AdbTcpClient {
 //		output.flush();
 	}
 
-	public String sendData(String data) throws Exception {
+	public String sendData(JSONObject data) throws Exception {
 		if (output == null){
 			throw new IllegalStateException("The output stream is not valid!");
 		}

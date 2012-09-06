@@ -1,6 +1,8 @@
 package org.topq.jsystem.mobile;
 
+import org.json.JSONObject;
+
 public interface IDataCallback {
 
-	public String dataReceived(String data);
+	public JSONObject dataReceived(String data);
 }

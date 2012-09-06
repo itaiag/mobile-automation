@@ -1,11 +1,22 @@
 package org.topq.mobile.robotium_client.impl;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
 
+import net.iharder.Base64;
+
 import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
 import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.topq.mobile.core.AdbController;
@@ -13,6 +24,7 @@ import org.topq.mobile.core.GeneralEnums;
 import org.topq.mobile.robotium_client.infrastructure.AdbTcpClient;
 
 import com.android.ddmlib.IDevice;
+import com.android.ddmlib.Log;
 
 public class RobotiumClientImpl implements MobileClintInterface {
 
@@ -27,8 +39,10 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	private static String testClassName = null;
 	private static String host = null;
 	private static String testName = null;
+	private static final String RESULT_STRING ="RESULT";
 
-	public RobotiumClientImpl(String configFile, boolean doDeply) throws Exception {
+	public RobotiumClientImpl(String configFile,boolean doDeply) throws Exception{
+
 		logger = Logger.getLogger(RobotiumClientImpl.class);
 		File file = new File(configFile);
 		if (file.exists()) {
@@ -77,23 +91,20 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	 *            serialised JSON object
 	 * @throws Exception
 	 */
-	public String sendData(final String data) throws Exception {
-		logger.info("Sending command: " + data);
-		String result = null;
-		IDevice device = getDevice();
-		logger.info("Send Data to " + device.getSerialNumber());
-
+	public String sendData(String command,String... params) throws Exception {	
+		String resultValue;
 		try {
-			result = tcpClient.sendData(data);
-			int splitIndex = result.indexOf("{");
-			if (splitIndex == -1) {
+			JSONObject result =  sendDataAndGetJSonObj(command, params);
+
+			if (result.isNull(RESULT_STRING)) {
 				logger.error("No data recieved from the device");
 				return NO_DATA_STRING;
 			}
-			if (result.contains(ERROR_STRING)) {
+			resultValue = (String) result.get(RESULT_STRING);
+			if (resultValue.contains(ERROR_STRING)) {
 				logger.error(result);
 				adb.getScreenShots(getDevice());
-			} else if (result.contains(SUCCESS_STRING)) {
+			} else if (resultValue.contains(SUCCESS_STRING)) {
 				logger.info(result);
 			}
 
@@ -104,108 +115,152 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		if (getScreenshots) {
 			adb.getScreenShots(getDevice());
 		}
-		return result;
+		return resultValue;
+	}
+
+	public JSONObject sendDataAndGetJSonObj(String command,String... params) throws Exception{
+		JSONObject jsonobj = new JSONObject();
+		jsonobj.put("Command", command);
+		jsonobj.put("Params", params);
+		logger.info("Sending command: " + jsonobj.toString());
+		JSONObject result = null;
+		IDevice device = getDevice();
+		logger.info("Send Data to " + device.getSerialNumber());
+
+		try {
+			result =  new JSONObject(tcpClient.sendData(jsonobj));
+		} catch (Exception e) {
+			logger.error("Failed to send / receive data", e);
+			throw e;
+		} 
+		return result;	
 	}
 
 	public String launch() throws Exception {
-		return sendData("{launch;}");
-
+		return sendData("launch");
 	}
 
 	public String getTextView(int index) throws Exception {
-		return sendData("{getTextView," + index + ";}");
+		return sendData("getTextView",Integer.toString(index));
 	}
 
 	public String getTextViewIndex(String text) throws Exception {
-		String response = sendData("{getTextViewIndex," + text + ";}");
+		String response = sendData("getTextViewIndex",text);
 		return response;
 	}
 
 	public String getCurrentTextViews() throws Exception {
-		return sendData("{getCurrentTextViews,a;}");
+		return sendData("getCurrentTextViews","a");
 	}
 
 	public String getText(int index) throws Exception {
-		return sendData("{getText," + index + ";}");
+		return sendData("getText",Integer.toString(index));
 	}
 
 	public String clickOnMenuItem(String item) throws Exception {
-		return sendData("{clickOnMenuItem," + item + ";}");
+		return sendData("clickOnMenuItem",item);
 	}
 
-	public String clickOnView(int index) throws Exception {
-		return sendData("{clickOnView," + index + ";}");
+
+	public String  clickOnView(int index) throws Exception {
+		return sendData("clickOnView",Integer.toString(index));
+
 	}
 
 	public String enterText(int index, String text) throws Exception {
-		return sendData("{enterText," + index + "," + text + ";}");
+		return sendData("enterText",Integer.toString(index),text);
 	}
 
 	public String clickOnButton(int index) throws Exception {
-		return sendData("{clickOnButton," + index + ";}");
+		return sendData("clickOnButton",Integer.toString(index));
 	}
 
 	public String clickInList(int index) throws Exception {
-		return sendData("{clickInList," + index + ";}");
+		return sendData("clickInList",Integer.toString(index));
 	}
 
 	public String clearEditText(int index) throws Exception {
-		return sendData("{clearEditText," + index + ";}");
+		return sendData("clearEditText",Integer.toString(index));
 	}
 
 	public String clickOnButtonWithText(String text) throws Exception {
-		return sendData("{clickOnButtonWithText," + text + ";}");
+		return sendData("clickOnButtonWithText",text);
 	}
 
 	public String clickOnText(String text) throws Exception {
-		return sendData("{clickOnText," + text + ";}");
-	}
-
-	public String clickOnHardwereButton(HardwareButtons button) throws Exception {
-		return sendData("{clickOnHardware," + button.name() + ";}");
-	}
-
-	public String goBack() throws Exception {
-		return sendData("{goBack,;}");
+		return sendData("clickOnText",text);
 	}
 
 	public String sendKey(int key) throws Exception {
-		return sendData("{sendKey," + key + ";}");
+		return sendData("sendKey", Integer.toString(key));
 	}
-
-	public void closeConnection() throws Exception {
-		sendData("{GodBay;}");
-		tcpClient.closeConnection();
-
+	
+	public String clickOnHardwereButton(HardwareButtons button) throws Exception{
+		return sendData("clickOnHardware",button.name());	
 	}
-
-	public AdbController getAdb() {
-		return adb;
+	
+	public byte[] pull(String fileName) throws Exception {	
+		JSONObject jsonObj = sendDataAndGetJSonObj("pull",fileName);		
+		logger.info("command pull receved" + jsonObj);		
+		return ((jsonObj.getString("file"))).getBytes("UTF-16LE");	
 	}
-
-	public void setAdb(AdbController adb) {
-		this.adb = adb;
-	}
-
-	private void setPortForwarding() throws Exception {
-		IDevice device = getDevice();
-		if (device.getState() == IDevice.DeviceState.ONLINE) {
-			device.createForward(port, GeneralEnums.SERVERPORT);
-		} else {
-			Exception e = new Exception("Unable to perform port forwarding - " + deviceSerial + " is not online");
-			logger.error(e);
-			throw e;
+	
+	public String push(String fileName, String newlocalFileName) throws Exception {
+		String result;
+		File file = new File(fileName);
+		BufferedInputStream in = new BufferedInputStream(new FileInputStream(
+				file));
+		int size = (int) file.length();
+		byte[] buffer = new byte[(int) file.length()];
+		try {
+			int n = in.read(buffer, 0, size);
+			while (n >= 0) {
+				System.out.write(buffer, 0, n);
+				n = in.read(buffer, 0, size);
+			}
+		} finally {
+			in.close();
 		}
+		result = sendData("createFileInServer", newlocalFileName,
+				Base64.encodeBytes(buffer, Base64.URL_SAFE), "true");
+		return result;
 	}
+		public void closeConnection() throws Exception {
+			sendData("GodBay");
+			tcpClient.closeConnection();
 
-	private IDevice getDevice() throws Exception {
-		IDevice device = adb.getDevice(deviceSerial);
-		if (null == device) {
-			Exception e = new Exception("Unable to find device with serial number: " + deviceSerial);
-			logger.error(e);
-			throw e;
 		}
-		return device;
-	}
 
-}
+		public AdbController getAdb() {
+			return adb;
+		}
+
+		public void setAdb(AdbController adb) {
+			this.adb = adb;
+		}
+
+		private void setPortForwarding() throws Exception {
+			IDevice device = getDevice();
+			if (device.getState() == IDevice.DeviceState.ONLINE) {
+				device.createForward(port, GeneralEnums.SERVERPORT);
+			} else {
+				Exception e = new Exception("Unable to perform port forwarding - " + deviceSerial + " is not online");
+				logger.error(e);
+				throw e;
+			}
+		}
+
+		private IDevice getDevice() throws Exception {
+			IDevice device = adb.getDevice(deviceSerial);
+			if (null == device) {
+				Exception e = new Exception("Unable to find device with serial number: " + deviceSerial);
+				logger.error(e);
+				throw e;
+			}
+			return device;
+		}
+
+		
+
+
+	}
