@@ -121,6 +121,19 @@ public class FrankClientImpl implements MobileClintInterface {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public byte[] pull(String fileName) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String push(String fileName, String newlocalFileName)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	private String sendMessage(String uiQueryPatern, String command,Object... arguments) {
 		CharSequence result = sendMessageWithRespons(uiQueryPatern, command,arguments);
@@ -151,6 +164,8 @@ public class FrankClientImpl implements MobileClintInterface {
 	private String sendMassageWithMarkerAsInt(String view, int marker,String command, Object... arguments) {
 		return sendMessage(view +" tag:"+Integer.toString(marker), command, arguments);
 	}
+
+
 
 
 }
