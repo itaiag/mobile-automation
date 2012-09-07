@@ -52,6 +52,6 @@ public interface MobileClintInterface {
 
 	public byte[] pull(String fileName) throws Exception;
 	
-	public String push(String fileName,String newlocalFileName) throws Exception;
+	public String push(byte[] data,String newlocalFileName) throws Exception;
 	
 }
