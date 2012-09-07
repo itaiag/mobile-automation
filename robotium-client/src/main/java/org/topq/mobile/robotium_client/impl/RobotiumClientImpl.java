@@ -194,35 +194,19 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	public String sendKey(int key) throws Exception {
 		return sendData("sendKey", Integer.toString(key));
 	}
-	
+	@Override
 	public String clickOnHardwereButton(HardwareButtons button) throws Exception{
 		return sendData("clickOnHardware",button.name());	
 	}
-	
+	@Override
 	public byte[] pull(String fileName) throws Exception {	
 		JSONObject jsonObj = sendDataAndGetJSonObj("pull",fileName);		
 		logger.info("command pull receved" + jsonObj);		
 		return ((jsonObj.getString("file"))).getBytes("UTF-16LE");	
 	}
-	
-	public String push(String fileName, String newlocalFileName) throws Exception {
-		String result;
-		File file = new File(fileName);
-		BufferedInputStream in = new BufferedInputStream(new FileInputStream(
-				file));
-		int size = (int) file.length();
-		byte[] buffer = new byte[(int) file.length()];
-		try {
-			int n = in.read(buffer, 0, size);
-			while (n >= 0) {
-				System.out.write(buffer, 0, n);
-				n = in.read(buffer, 0, size);
-			}
-		} finally {
-			in.close();
-		}
-		result = sendData("createFileInServer", newlocalFileName,
-				Base64.encodeBytes(buffer, Base64.URL_SAFE), "true");
+	@Override
+	public String push(byte[] data, String newlocalFileName) throws Exception {
+		String result = sendData("createFileInServer", newlocalFileName,Base64.encodeBytes(data, Base64.URL_SAFE), "true");
 		return result;
 	}
 		public void closeConnection() throws Exception {
