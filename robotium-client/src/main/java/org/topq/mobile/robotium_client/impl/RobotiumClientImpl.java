@@ -235,9 +235,10 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		return device;
 	}
 
-	public String activateIntent(String... args) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public String activateIntent(String... params) throws Exception {
+		return sendData("activateIntent",params);
 	}
+	
+	
 
 }
