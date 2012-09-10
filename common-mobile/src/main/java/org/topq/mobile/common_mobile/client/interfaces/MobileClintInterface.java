@@ -44,7 +44,7 @@ public interface MobileClintInterface {
 
 //	public String goBack() throws Exception;
 	
-	public String clickOnHardwereButton(HardwareButtons button) throws Exception;
+	public String clickOnHardwareButton(HardwareButtons button) throws Exception;
 	
 	public String sendKey(int key) throws Exception;
 	
@@ -53,5 +53,7 @@ public interface MobileClintInterface {
 	public byte[] pull(String fileName) throws Exception;
 	
 	public String push(byte[] data,String newlocalFileName) throws Exception;
+
+	public String activateIntent(String... args) throws Exception;
 	
 }
