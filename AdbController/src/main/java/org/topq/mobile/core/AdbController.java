@@ -45,7 +45,7 @@ public class AdbController {
 	private File adbLocation;
 	private String deviceIds;
 	private int[] portsList;
-	private String[] devicesList;
+	private ArrayList<String> devicesList = new ArrayList<String>();
 	private String host = "localhost";
 	private int tcpPort = 5555;
 	private CommunicationBus communicationBus = CommunicationBus.USB;
@@ -54,31 +54,61 @@ public class AdbController {
 	private Logger logger = null;
 
 	private ArrayList<IDevice> devices;
+	private static AdbController adbController;
+	private boolean adbOn = false;
 
 	/**
 	 * Init the system object. Get all the connected devices (if exist), set
 	 * port forwarding & init the TCP connection
 	 */
-	public AdbController(String deviceIds) throws Exception {
+	private AdbController() throws Exception {
 		logger = Logger.getLogger(AdbController.class);
-		setDeviceIds(deviceIds);
 		adbLocation = fendAdbFile();
 		devices = new ArrayList<IDevice>();
 
-		boolean success = true;
+		adbOn = true;
 
 		// Init the AndroidDebugBridge object
 		AndroidDebugBridge.init(false);
 		adb = AndroidDebugBridge.createBridge(adbLocation.getAbsolutePath() + File.separator + "adb", true);
 		if (adb == null) {
-			success = false;
+			adbOn = false;
+		}
+	}
+
+	public static AdbController getInst() throws Exception {
+		if (adbController == null) {
+			synchronized (new Object()) {
+				if (adbController == null) {
+					adbController = new AdbController();
+					return adbController;
+				} else {
+					return adbController;
+				}
+			}
+		} else {
+			return adbController;
 		}
 
-		if (success) {
+	}
+
+	/**
+	 * connects via adb to all devices listed in devicesList array
+	 * 
+	 * @throws Exception
+	 */
+	public void connectViaAdb() throws Exception {
+		if (adbOn) {
 			if (communicationBus.equals(CommunicationBus.WIFI)) {
+				if (devicesList.size() == 0) {
+					Exception e = new Exception("No devices in device list");
+					logger.error(e);
+					throw e;
+				}
+
 				// Send ADB connect command for each device in the device list
-				for (int i = 0; i < devicesList.length; i++) {
-					String cmd = "adb connect " + devicesList[i] + ":" + tcpPort;
+				for (int i = 0; i < devicesList.size(); i++) {
+					String cmd = "adb connect " + devicesList.get(i) + ":" + tcpPort;
 					Runtime run = Runtime.getRuntime();
 					Process pr = run.exec(cmd);
 					pr.waitFor();
@@ -93,7 +123,8 @@ public class AdbController {
 						logger.debug(String.valueOf(cbuf));
 
 					} else {
-						Exception e = new Exception("Unable to communicate with the ADB try to kill the process (task manager) and re-run");
+						Exception e = new Exception(
+								"Unable to communicate with the ADB try to kill the process (task manager) and re-run");
 						logger.error(e);
 						throw e;
 
@@ -105,7 +136,7 @@ public class AdbController {
 		Thread.sleep(5000);
 
 		// Get devices list
-		if (success) {
+		if (adbOn) {
 			int count = 0;
 			while (adb.hasInitialDeviceList() == false) {
 				try {
@@ -114,15 +145,15 @@ public class AdbController {
 				} catch (InterruptedException e) {
 				}
 				if (count > 1000) {
-					success = false;
+					adbOn = false;
 					break;
 				}
 			}
-			if (success)
+			if (adbOn)
 				getDevicesList();
 		}
 
-		if (!success) {
+		if (!adbOn) {
 			Exception e = new Exception("Unable to connect to any Android devices");
 			logger.error(e);
 			terminate();
@@ -139,18 +170,11 @@ public class AdbController {
 	 * Close system object, close the TCP connections & remove port forwarding
 	 */
 	public void close() {
-		// for (int i=0; i<adbClient.length; i++) {
-		// try {
-		// adbClient[i].closeConnection();
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-		// }
 		for (int i = 0; i < devices.size(); i++) {
 			try {
 				// If in WiFi mode send a disconnect
 				if (communicationBus.equals(CommunicationBus.WIFI)) {
-					String cmd = "adb disconnect " + devicesList[i] + ":" + tcpPort;
+					String cmd = "adb disconnect " + devicesList.get(i) + ":" + tcpPort;
 					Runtime run = Runtime.getRuntime();
 					Process pr = run.exec(cmd);
 					pr.waitFor();
@@ -164,7 +188,8 @@ public class AdbController {
 						buf.read(cbuf);
 						logger.debug(String.valueOf(cbuf));
 					} else {
-						Exception e = new Exception("Unable to communicate with the ADB try to kill the process (task manager) and re-run");
+						Exception e = new Exception(
+								"Unable to communicate with the ADB try to kill the process (task manager) and re-run");
 						logger.error(e);
 						throw e;
 
@@ -225,19 +250,17 @@ public class AdbController {
 	 * be added !
 	 */
 	private void getDevicesList() {
-		if (devices.size() == 0) {
-			IDevice[] allDevices = adb.getDevices();
-			for (IDevice device : allDevices) {
-				logger.debug("Device " + device.getSerialNumber() + " Status: " + device.getState());
-				if (device.isOnline()) {
-					String deviceName = device.getSerialNumber();
-					if (communicationBus.equals(CommunicationBus.WIFI) && deviceName.contains(":"))
-						deviceName = deviceName.substring(0, deviceName.indexOf(":"));
-					if (deviceIds != null && deviceIds.contains(deviceName)) {
-						devices.add(device);
-					} else if (deviceIds == null)
-						devices.add(device);
-				}
+		IDevice[] allDevices = adb.getDevices();
+		for (IDevice device : allDevices) {
+			logger.debug("Device " + device.getSerialNumber() + " Status: " + device.getState());
+			if (device.isOnline()) {
+				String deviceName = device.getSerialNumber();
+				if (communicationBus.equals(CommunicationBus.WIFI) && deviceName.contains(":"))
+					deviceName = deviceName.substring(0, deviceName.indexOf(":"));
+				if (deviceIds != null && deviceIds.contains(deviceName) && !devices.contains(device)) {
+					devices.add(device);
+				} else if (deviceIds == null)
+					devices.add(device);
 			}
 		}
 	}
@@ -437,7 +460,8 @@ public class AdbController {
 	 *            file name on the device
 	 * @throws Exception
 	 */
-	public void getFileFromDevice(String deviceName, String fileLocation, String fileName, String localLocation) throws Exception {
+	public void getFileFromDevice(String deviceName, String fileLocation, String fileName, String localLocation)
+			throws Exception {
 		IDevice device = getDevice(deviceName);
 		if (device == null) {
 			logger.warn("Unable to get file from device");
@@ -453,7 +477,8 @@ public class AdbController {
 			File local = new File(localLocation.substring(0, localLocation.lastIndexOf(fileName) - 1));
 			if (!local.exists())
 				local.mkdirs();
-			device.getSyncService().pullFile(fileLocation + "/" + fileName, localLocation, SyncService.getNullProgressMonitor());
+			device.getSyncService().pullFile(fileLocation + "/" + fileName, localLocation,
+					SyncService.getNullProgressMonitor());
 			// ReporterHelper.copyFileToReporterAndAddLink(report, new
 			// File(localLocation), devStr + "_" + fileName);
 			// FileUtils.deleteFile(localLocation);
@@ -473,14 +498,16 @@ public class AdbController {
 	 *            file name on the device
 	 * @throws Exception
 	 */
-	public void pushFileToDevice(String deviceName, String fileLocation, String fileName, String localLocation) throws Exception {
+	public void pushFileToDevice(String deviceName, String fileLocation, String fileName, String localLocation)
+			throws Exception {
 		IDevice device = getDevice(deviceName);
 		if (device == null) {
 			logger.warn("Unable to push file to device");
 			return;
 		}
 		try {
-			device.getSyncService().pushFile(localLocation, fileLocation + "/" + fileName, SyncService.getNullProgressMonitor());
+			device.getSyncService().pushFile(localLocation, fileLocation + "/" + fileName,
+					SyncService.getNullProgressMonitor());
 		} catch (Exception e) {
 			logger.error("Exception ", e);
 			throw e;
@@ -497,14 +524,15 @@ public class AdbController {
 	 * @throws AdbCommandRejectedException
 	 * @throws TimeoutException
 	 */
-	public void installAPK(String serverConfFileLocation, String apkLocation) throws InstallException, TimeoutException, AdbCommandRejectedException,
-			ShellCommandUnresponsiveException, IOException {
+	public void installAPK(String serverConfFileLocation, String apkLocation) throws InstallException,
+			TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
 		if (devices.size() == 0)
 			getDevicesList();
 		for (int i = 0; i < devices.size(); i++) {
 			try {
 				devices.get(i).installPackage(apkLocation, true);
-				devices.get(i).executeShellCommand("cp " + serverConfFileLocation + " /data/conf.txt", new NullOutputReceiver());
+				devices.get(i).executeShellCommand("cp " + serverConfFileLocation + " /data/conf.txt",
+						new NullOutputReceiver());
 			} catch (InstallException e) {
 				logger.error("Error while installing APK file", e);
 				throw e;
@@ -539,16 +567,18 @@ public class AdbController {
 	 * @throws Exception
 	 */
 	public void runTestOnDevice(String pakageName, String testClassName, String testName) throws Exception {
-		String cmd = adbLocation.getAbsolutePath() + "\\adb -s " + deviceIds + " shell am instrument -e class " + pakageName + "." + testClassName
-				+ "#" + testName + " " + pakageName + "/android.test.InstrumentationTestRunner";
+		String cmd = adbLocation.getAbsolutePath() + "\\adb -s " + deviceIds + " shell am instrument -e class "
+				+ pakageName + "." + testClassName + "#" + testName + " " + pakageName
+				+ "/android.test.InstrumentationTestRunner";
 		Runtime run = Runtime.getRuntime();
 		Process pr = run.exec(cmd);
 		pr.waitFor();
 		Thread.sleep(TimeUnit.SECONDS.toMillis(2));
-//		getDevice(deviceIds).executeShellCommand("shell am instrument -e class "+pakageName+"."+testClassName+"#"+testName+" "+pakageName+"/android.test.InstrumentationTestRunner",new NullOutputReceiver());
+		// getDevice(deviceIds).executeShellCommand("shell am instrument -e class "+pakageName+"."+testClassName+"#"+testName+" "+pakageName+"/android.test.InstrumentationTestRunner",new
+		// NullOutputReceiver());
 		// getDevice(deviceIds).executeShellCommand("am instrument -e class "+pakageName+"."+testClassName+"#"+testName+" "+pakageName+"/android.test.InstrumentationTestRunner",new
 		// NullOutputReceiver());
-//		 Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+		// Thread.sleep(TimeUnit.SECONDS.toMillis(2));
 	}
 
 	public CommunicationBus getCommunicationBus() {
@@ -576,14 +606,36 @@ public class AdbController {
 	}
 
 	/**
-	 * Device IDs - can be either IP address or Serial number
+	 * Device IDs - can be either IP address or Serial number A list of comma
+	 * separated values;
 	 * 
 	 * @param deviceIds
 	 */
 	public void setDeviceIds(String deviceIds) {
 		this.deviceIds = deviceIds;
-		devicesList = deviceIds.split(";");
-		portsList = new int[devicesList.length];
+		String[] deviceArr = deviceIds.split(";");
+		for (String deviceId : deviceArr) {
+			devicesList.add(deviceId);
+		}
+		portsList = new int[devicesList.size()];
+		for (int i = 0; i < portsList.length; i++)
+			portsList[i] = 1234 + i;
+	}
+
+	/**
+	 * add one device to the device list
+	 * 
+	 * @param deviceId
+	 *            - can be either serial or IP address
+	 */
+	public void addDevice(String deviceId) {
+		if (null == deviceIds) {
+			deviceIds = deviceId;
+		} else {
+			deviceIds += ";" + deviceId;
+		}
+		devicesList.add(deviceId);
+		portsList = new int[devicesList.size()];
 		for (int i = 0; i < portsList.length; i++)
 			portsList[i] = 1234 + i;
 	}
