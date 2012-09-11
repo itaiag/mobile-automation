@@ -7,7 +7,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
-	<classpathentry kind="lib" path="src/main/resources/lib/ddmlib.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/lib/ddmlib.jar" sourcepath="C:/Program Files/Android/android-sdk/sources/android-16/android"/>
 	<classpathentry kind="lib" path="src/main/resources/lib/log4j.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/AdbController"/>
 	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">

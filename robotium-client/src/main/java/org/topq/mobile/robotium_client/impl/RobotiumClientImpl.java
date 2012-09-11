@@ -57,7 +57,9 @@ public class RobotiumClientImpl implements MobileClintInterface {
 			host = pro.getProperty("Host");
 			logger.debug("Host  Name is:" + host);
 			deviceSerial = pro.getProperty("DeviceSerail");
-			adb = new AdbController(deviceSerial);
+			adb = AdbController.getInst(); 
+			adb.addDevice(deviceSerial);
+			adb.connectViaAdb();
 			String serverConfFileLocation = pro.getProperty("ServerConfFile");
 			if (doDeploy) {
 				adb.installAPK(serverConfFileLocation, temeroryProrp);
@@ -217,7 +219,10 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	private void setPortForwarding() throws Exception {
 		IDevice device = getDevice();
 		if (device.getState() == IDevice.DeviceState.ONLINE) {
-			device.createForward(port, GeneralEnums.SERVERPORT);
+			if(device.getSerialNumber().equals("01497C261801E01A"))
+				device.createForward(port, GeneralEnums.SERVERPORT);
+			else
+				device.createForward(port, 4322);
 		} else {
 			Exception e = new Exception("Unable to perform port forwarding - " + deviceSerial + " is not online");
 			logger.error(e);
