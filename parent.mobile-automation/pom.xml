@@ -10,8 +10,8 @@
 	<modules>
 		<module>../AdbController</module>
 		<module>../common-mobile</module>
-		<module>../frank-client</module>
-		<module>../robotium-client</module>		
+<!-- 		<module>../frank-client</module> -->
+		<module>../robotium-client</module>
 	</modules>
 	<repositories>
 		<repository>
@@ -19,4 +19,10 @@
 			<url>http://80.74.108.9/content/groups/public</url>
 		</repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>TOP-Q_plugin_repo</id>
+			<url>http://80.74.108.9:80/content/groups/public</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
