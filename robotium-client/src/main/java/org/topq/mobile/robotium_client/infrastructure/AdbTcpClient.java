@@ -3,12 +3,13 @@ package org.topq.mobile.robotium_client.infrastructure;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
-import org.json.JSONML;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.topq.mobile.robotium_client.impl.RobotiumClientImpl;
 
 /**
  * <b>ADB TCP Client</b><br>
@@ -17,42 +18,53 @@ import org.json.JSONObject;
  *
  */
 public class AdbTcpClient {
-
-	private Socket socket = null;
-	private PrintWriter output = null;
-	private BufferedReader input = null;
+	private static Logger logger = Logger.getLogger(RobotiumClientImpl.class);
+	private final String host;
+	private final int port;
+	private String lastResult;
 
 	public AdbTcpClient(String host, int port) throws Exception {
-		// Create a new socket
-		socket = new Socket(host, port);
-		OutputStream out = socket.getOutputStream();
-		// Create the output stream writer
-		output = new PrintWriter(out);
-		// Create the input stream reader
-		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		
-//		output.flush();
+		this.host = host;
+		this.port = port;
 	}
 
-	public String sendData(JSONObject data) throws Exception {
-		if (output == null){
-			throw new IllegalStateException("The output stream is not valid!");
+	public String sendData(JSONObject data) {
+		Socket socket = null;
+		BufferedReader input = null;
+		try {
+			socket = new Socket(host, port);
+			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			PrintWriter output = new PrintWriter(socket.getOutputStream());
+			output.println(data);
+			output.flush();
+			lastResult = input.readLine();
+		} catch (UnknownHostException e) {
+			logger.error("Uknown host ");
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			logger.error("Failed sending data due to ",e);
+			e.printStackTrace();
+			return null;
+		} finally{
+			try {
+				if (input != null){
+					input.close();
+				}
+				if (socket != null){
+					socket.close();
+				}
+				
+			}catch (Exception e){
+				logger.error("Failed closing resources due to ",e);
+			}
 		}
-		// Write to socket
-		output.println(data);
-		output.flush();
-		// Wait for response
-		return input.readLine();
+		return lastResult;
 	}
 
 	public String getData() throws IOException {
-		return input.readLine();
+		return lastResult;
 	}
 	
-	public void closeConnection() throws Exception {
-		input.close();
-		output.close();
-		socket.close();
-	}
 
 }

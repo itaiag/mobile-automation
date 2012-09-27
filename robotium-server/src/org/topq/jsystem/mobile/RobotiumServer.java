@@ -42,9 +42,10 @@ public class RobotiumServer extends ActivityInstrumentationTestCase2 implements 
 		serverThread = new Thread(server);
 		serverThread.start();
 		Log.i(TAG, "Server is up");
-		while (continueRunning) {
+		while (continueRunning && server.isRunning()) {
 			Thread.sleep(1000);
 		}
+		Log.i(TAG, "Server is down");
 	}
 
 	public void testNewTest() throws Exception {

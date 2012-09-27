@@ -587,6 +587,8 @@ public class AdbController {
 		for (int i = 0; i < portsList.length; i++)
 			portsList[i] = 1234 + i;
 	}
+	
+	
 
 	public int getTcpPort() {
 		return tcpPort;

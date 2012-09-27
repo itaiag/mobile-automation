@@ -10,8 +10,6 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
-//import com.nuvoton.common.GeneralEnums;
-
 import android.util.Log;
 
 /**
@@ -24,6 +22,8 @@ import android.util.Log;
 public class TcpServer implements Runnable {
 
 	private static final String TAG = "TcpServer";
+
+	private static final int PORT = 4321;
 
 	private ArrayList<IDataCallback> listeners;
 
@@ -55,46 +55,116 @@ public class TcpServer implements Runnable {
 	public void run() {
 		ServerSocket serverSocket = null;
 		Socket clientSocket = null;
-		PrintWriter out = null;
-		BufferedReader in = null;
 		try {
-			serverSocket = new ServerSocket(4321);
-			String line = null;
-			Log.d(TAG, "Whiting for conntact: '" + line + "'");
-			clientSocket = serverSocket.accept();
+			serverSocket = new ServerSocket(PORT);
 			do {
-				out = new PrintWriter(clientSocket.getOutputStream(), true);
-				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-
-				line = in.readLine();
-				if(line!=null){
-					Log.d(TAG, "Received: '" + line + "'");
-					JSONObject response = null;
-					for (IDataCallback listener : listeners) {
-						// TODO: This is not the best implementation. The
-						// response should be handled differently.
-						response = listener.dataReceived(line);
+				Log.d(TAG, "Server is waiting for connection");
+				clientSocket = serverSocket.accept();
+				PrintWriter out = null;
+				BufferedReader in = null;
+				try {
+					Log.d(TAG, "Connection was established");
+					out = new PrintWriter(clientSocket.getOutputStream(), true);
+					in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+					String line = in.readLine();
+					if (line != null) {
+						Log.d(TAG, "Received: '" + line + "'");
+						if (line.trim().equals("{\"Command\":\"exit\",\"Params\":[]}")) {
+							done = true;
+						}
+						JSONObject response = null;
+						for (IDataCallback listener : listeners) {
+							// TODO: This is not the best implementation. The
+							// response should be handled differently.
+							response = listener.dataReceived(line);
+						}
+						out.println(response);
+						out.flush();
 					}
-					out.println(response);
+
+					
+					
+				}  catch (Exception e) {
+					Log.e(TAG, "Failed to process request due to" + e.getMessage());
+				} finally {
+					// Closing resources
+					if (null != out) {
+						out.close();
+					}
+					try {
+						if (null != in) {
+							in.close();
+						}
+						if (null != clientSocket) {
+							clientSocket.close();
+						}
+					} catch (Exception e) {
+						Log.w(TAG, "exception was caught while closing resources", e);
+					}
+				} 
+			} while (!done);
+		}
+		catch (IOException e){ 
+			Log.w(TAG, "exception was caught while handling server socket", e);
+		}
+		
+		finally {
+			if (null != serverSocket ){
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					Log.w(TAG, "exception was caught while closing resources", e);
 				}
-			} while (!line.equals("exit"));
-			out.close();
-			in.close();
-			clientSocket.close();
-		} catch (Exception e) {
-			Log.e(TAG, "Failed due to "+e.getMessage());
-		} finally {
-			out.close();
-			try {
-				in.close();
-				clientSocket.close();
-				serverSocket.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
+	}
+				
+
+//			} while (!done);
+//			clientSocket = serverSocket.accept();
+//			String line = null;
+//			do {
+//				Log.d(TAG, "Connection was established");
+//				out = new PrintWriter(clientSocket.getOutputStream(), true);
+//				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+//
+//				line = in.readLine();
+//				if (line != null) {
+//					Log.d(TAG, "Received: '" + line + "'");
+//					if (line.trim().toLowerCase().equals("exit")) {
+//						done = true;
+//					}
+//					JSONObject response = null;
+//					for (IDataCallback listener : listeners) {
+//						// TODO: This is not the best implementation. The
+//						// response should be handled differently.
+//						response = listener.dataReceived(line);
+//					}
+//					out.println(response);
+//				}
+//			} while (!done);
+//		} catch (Exception e) {
+//			Log.e(TAG, "Failed due to " + e.getMessage());
+//		} finally {
+//			// Closing resources
+//			if (null != out) {
+//				out.close();
+//			}
+//			try {
+//				if (null != in) {
+//					in.close();
+//				}
+//				if (null != clientSocket) {
+//					clientSocket.close();
+//				}
+//				if (null != serverSocket) {
+//					serverSocket.close();
+//				}
+//
+//			} catch (Exception e) {
+//				Log.w(TAG, "exception was caught while closing resources", e);
+//			}
+//			done = true;
 
 		// String inputLine;
 		// long startTime;
@@ -137,9 +207,12 @@ public class TcpServer implements Runnable {
 		// } catch (InterruptedException e) {
 		// Log.e(TAG, "InterruptedException", e);
 		// }
-	}
 
 	public void stop() {
 		done = true;
+	}
+
+	public boolean isRunning() {
+		return !done;
 	}
 }

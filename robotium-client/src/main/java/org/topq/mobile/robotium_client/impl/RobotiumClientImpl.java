@@ -21,7 +21,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 
 	private AdbTcpClient tcpClient;
 	private static AdbController adb;
-	private static Logger logger = null;
+	private static Logger logger = Logger.getLogger(RobotiumClientImpl.class);;
 	private static boolean getScreenshots = false;
 	private static int port = 6100;
 	private static String deviceSerial;
@@ -33,42 +33,45 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	private static final String RESULT_STRING = "RESULT";
 
 	public RobotiumClientImpl(String configFile, boolean doDeply) throws Exception {
-
-		logger = Logger.getLogger(RobotiumClientImpl.class);
 		File file = new File(configFile);
 		if (file.exists()) {
 			Properties pro = new Properties();
 			InputStream in = new FileInputStream(file);
 			pro.load(in);
-			String temeroryProrp = pro.getProperty("Port");
-			logger.debug("In Properties file port is:" + temeroryProrp);
-			port = Integer.parseInt(temeroryProrp);
-			temeroryProrp = pro.getProperty("DeviceSerail");
-			logger.debug("In Properties file DeviceSerial is:" + temeroryProrp);
-			apkLocation = temeroryProrp;
-			temeroryProrp = pro.getProperty("ApkLocation");
+			
+			port = Integer.parseInt(pro.getProperty("Port"));
+			logger.debug("In Properties file port is:" + port);
+			
+			deviceSerial = pro.getProperty("DeviceSerail");
+			logger.debug("In Properties file device serial is:" + deviceSerial);
+			
+			apkLocation = pro.getProperty("ApkLocation");;
 			logger.debug("APK location is:" + apkLocation);
+			
 			pakageName = pro.getProperty("PakageName");
 			logger.debug("Pakage Name is:" + pakageName);
+			
 			testClassName = pro.getProperty("TestClassName");
 			logger.debug("Test Class Name is:" + testClassName);
+			
 			testName = pro.getProperty("TestName");
 			logger.debug("Test  Name is:" + testName);
+			
 			host = pro.getProperty("Host");
 			logger.debug("Host  Name is:" + host);
-			deviceSerial = pro.getProperty("DeviceSerail");
+			
 			adb = new AdbController(deviceSerial);
 			String serverConfFileLocation = pro.getProperty("ServerConfFile");
 			if (doDeply) {
-				adb.installAPK(serverConfFileLocation, temeroryProrp);
+				adb.installAPK(serverConfFileLocation, apkLocation);
 			}
 			adb.runTestOnDevice(pakageName, testClassName, testName);
 			logger.info("Start server on device");
 			setPortForwarding();
 			tcpClient = new AdbTcpClient(host, port);
 		} else {
-			Exception e = new Exception("Can't fiend the file:" + file.getAbsolutePath());
-			logger.error("Can't fiend the file:" + file.getAbsolutePath());
+			Exception e = new Exception("File not found:" + file.getAbsolutePath());
+			logger.error("File not found:" + file.getAbsolutePath());
 			throw e;
 		}
 	}
@@ -201,8 +204,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	}
 
 	public void closeConnection() throws Exception {
-		sendData("GodBay");
-		tcpClient.closeConnection();
+		sendData("exit");
 
 	}
 
