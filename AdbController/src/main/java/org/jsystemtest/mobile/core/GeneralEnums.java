@@ -1,4 +1,4 @@
-package org.topq.mobile.core;
+package org.jsystemtest.mobile.core;
 
 public class GeneralEnums {
 

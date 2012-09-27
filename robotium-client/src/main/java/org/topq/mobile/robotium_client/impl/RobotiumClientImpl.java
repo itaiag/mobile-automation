@@ -2,6 +2,7 @@ package org.topq.mobile.robotium_client.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -9,18 +10,17 @@ import net.iharder.Base64;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.jsystemtest.mobile.core.AdbController;
+import org.jsystemtest.mobile.core.AndroidDevice;
+import org.jsystemtest.mobile.core.GeneralEnums;
 import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
 import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
-import org.topq.mobile.core.AdbController;
-import org.topq.mobile.core.GeneralEnums;
 import org.topq.mobile.robotium_client.infrastructure.AdbTcpClient;
-
-import com.android.ddmlib.IDevice;
 
 public class RobotiumClientImpl implements MobileClintInterface {
 
 	private AdbTcpClient tcpClient;
-	private static AdbController adb;
+	private AndroidDevice device;
 	private static Logger logger = Logger.getLogger(RobotiumClientImpl.class);;
 	private static boolean getScreenshots = false;
 	private static int port = 6100;
@@ -32,48 +32,56 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	private static String testName = null;
 	private static final String RESULT_STRING = "RESULT";
 
-	public RobotiumClientImpl(String configFile, boolean doDeply) throws Exception {
-		File file = new File(configFile);
-		if (file.exists()) {
-			Properties pro = new Properties();
-			InputStream in = new FileInputStream(file);
-			pro.load(in);
-			
-			port = Integer.parseInt(pro.getProperty("Port"));
-			logger.debug("In Properties file port is:" + port);
-			
-			deviceSerial = pro.getProperty("DeviceSerail");
-			logger.debug("In Properties file device serial is:" + deviceSerial);
-			
-			apkLocation = pro.getProperty("ApkLocation");;
-			logger.debug("APK location is:" + apkLocation);
-			
-			pakageName = pro.getProperty("PakageName");
-			logger.debug("Pakage Name is:" + pakageName);
-			
-			testClassName = pro.getProperty("TestClassName");
-			logger.debug("Test Class Name is:" + testClassName);
-			
-			testName = pro.getProperty("TestName");
-			logger.debug("Test  Name is:" + testName);
-			
-			host = pro.getProperty("Host");
-			logger.debug("Host  Name is:" + host);
-			
-			adb = new AdbController(deviceSerial);
-			String serverConfFileLocation = pro.getProperty("ServerConfFile");
-			if (doDeply) {
-				adb.installAPK(serverConfFileLocation, apkLocation);
-			}
-			adb.runTestOnDevice(pakageName, testClassName, testName);
-			logger.info("Start server on device");
-			setPortForwarding();
-			tcpClient = new AdbTcpClient(host, port);
-		} else {
-			Exception e = new Exception("File not found:" + file.getAbsolutePath());
-			logger.error("File not found:" + file.getAbsolutePath());
-			throw e;
+	public RobotiumClientImpl(String configFileName, boolean doDeply) throws Exception {
+		final File configFile = new File(configFileName);
+		if (!configFile.exists()) {
+			throw new IOException("Configuration file was not found in " + configFileName);
 		}
+
+		Properties configProperties = new Properties();
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream(configFile);
+			configProperties.load(in);
+			
+		}finally {
+			in.close();
+		}
+		
+		
+		port = Integer.parseInt(configProperties.getProperty("Port"));
+		logger.debug("In Properties file port is:" + port);
+
+		deviceSerial = configProperties.getProperty("DeviceSerail");
+		logger.debug("In Properties file device serial is:" + deviceSerial);
+
+		apkLocation = configProperties.getProperty("ApkLocation");
+		;
+		logger.debug("APK location is:" + apkLocation);
+
+		pakageName = configProperties.getProperty("PakageName");
+		logger.debug("Pakage Name is:" + pakageName);
+
+		testClassName = configProperties.getProperty("TestClassName");
+		logger.debug("Test Class Name is:" + testClassName);
+
+		testName = configProperties.getProperty("TestName");
+		logger.debug("Test  Name is:" + testName);
+
+		host = configProperties.getProperty("Host");
+		logger.debug("Host  Name is:" + host);
+
+		device = AdbController.getInstance().waitForDeviceToConnect(deviceSerial);
+		if (doDeply) {
+			// String serverConfFileLocation =
+			// pro.getProperty("ServerConfFile");
+			device.installAPK(apkLocation, true);
+			// TODO: Handle the configuration file via push
+		}
+		device.runTestOnDevice(pakageName, testClassName, testName);
+		logger.info("Start server on device");
+		setPortForwarding();
+		tcpClient = new AdbTcpClient(host, port);
 	}
 
 	/**
@@ -97,7 +105,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 			resultValue = (String) result.get(RESULT_STRING);
 			if (resultValue.contains(ERROR_STRING)) {
 				logger.error(result);
-				adb.getScreenShots(getDevice());
+				device.getScreenshot(null);
 			} else if (resultValue.contains(SUCCESS_STRING)) {
 				logger.info(result);
 			}
@@ -107,7 +115,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 			throw e;
 		}
 		if (getScreenshots) {
-			adb.getScreenShots(getDevice());
+			device.getScreenshot(null);
 		}
 		return resultValue;
 	}
@@ -118,7 +126,6 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		jsonobj.put("Params", params);
 		logger.info("Sending command: " + jsonobj.toString());
 		JSONObject result = null;
-		IDevice device = getDevice();
 		logger.info("Send Data to " + device.getSerialNumber());
 
 		try {
@@ -199,7 +206,8 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	}
 
 	public String push(byte[] data, String newlocalFileName) throws Exception {
-		String result = sendData("createFileInServer", newlocalFileName, Base64.encodeBytes(data, Base64.URL_SAFE), "true");
+		String result = sendData("createFileInServer", newlocalFileName, Base64.encodeBytes(data, Base64.URL_SAFE),
+				"true");
 		return result;
 	}
 
@@ -208,18 +216,9 @@ public class RobotiumClientImpl implements MobileClintInterface {
 
 	}
 
-	public AdbController getAdb() {
-		return adb;
-	}
-
-	public void setAdb(AdbController adb) {
-		this.adb = adb;
-	}
-
 	private void setPortForwarding() throws Exception {
-		IDevice device = getDevice();
-		if (device.getState() == IDevice.DeviceState.ONLINE) {
-			device.createForward(port, GeneralEnums.SERVERPORT);
+		if (device.isOnline()) {
+			device.setPortForwarding(port, GeneralEnums.SERVERPORT);
 		} else {
 			Exception e = new Exception("Unable to perform port forwarding - " + deviceSerial + " is not online");
 			logger.error(e);
@@ -227,13 +226,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		}
 	}
 
-	private IDevice getDevice() throws Exception {
-		IDevice device = adb.getDevice(deviceSerial);
-		if (null == device) {
-			Exception e = new Exception("Unable to find device with serial number: " + deviceSerial);
-			logger.error(e);
-			throw e;
-		}
+	private AndroidDevice getDevice() throws Exception {
 		return device;
 	}
 
