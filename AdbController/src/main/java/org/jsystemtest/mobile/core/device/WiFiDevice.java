@@ -1,10 +1,11 @@
-package org.jsystemtest.mobile.core;
+package org.jsystemtest.mobile.core.device;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
+import org.jsystemtest.mobile.core.ConnectionException;
 
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;

@@ -1,4 +1,4 @@
-package org.jsystemtest.mobile.core;
+package org.jsystemtest.mobile.core.device;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -7,6 +7,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.jsystemtest.mobile.core.AdbController;
+import org.jsystemtest.mobile.core.ConnectionException;
 
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;

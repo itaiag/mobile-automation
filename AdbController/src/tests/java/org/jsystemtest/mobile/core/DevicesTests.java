@@ -2,6 +2,7 @@ package org.jsystemtest.mobile.core;
 
 import junit.framework.Assert;
 
+import org.jsystemtest.mobile.core.device.USBDevice;
 import org.junit.Before;
 import org.junit.Test;
 
