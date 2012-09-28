@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -31,17 +32,14 @@ public class AdbController implements IDeviceChangeListener {
 	}
 
 	private final static Logger logger = Logger.getLogger(AdbController.class);
-	private static AdbController adbController;
+	private static AdbController instance;
 
 	private File adbLocation;
 	private long timeoutForDeviceConnection = 5000;
-	private HashMap<String, AndroidDevice> devices = new HashMap<String, AndroidDevice>();
+	private Map<String, AbstractAndroidDevice> devices = new HashMap<String, AbstractAndroidDevice>();
 	private CommunicationBus communicationBus = CommunicationBus.USB;
 	private AndroidDebugBridge adb;
 
-	//WiFi connection
-	private String host = "localhost";
-	private int tcpPort = 5555;
 	/**
 	 * Init the system object. Get all the connected devices (if exist), set
 	 * port forwarding & init the TCP connection
@@ -59,14 +57,14 @@ public class AdbController implements IDeviceChangeListener {
 	}
 
 	public static AdbController getInstance() throws Exception {
-		if (adbController == null) {
+		if (instance == null) {
 			synchronized (AdbController.class) {
-				if (adbController == null) {
-					adbController = new AdbController();
+				if (instance == null) {
+					instance = new AdbController();
 				}
 			}
 		}
-		return adbController;
+		return instance;
 
 	}
 
@@ -74,7 +72,7 @@ public class AdbController implements IDeviceChangeListener {
 	 * Close system object, close the TCP connections & remove port forwarding
 	 */
 	public void close() {
-		for (AndroidDevice device : devices.values()) {
+		for (AbstractAndroidDevice device : devices.values()) {
 			device.disconnect();
 		}
 		terminate();
@@ -94,7 +92,7 @@ public class AdbController implements IDeviceChangeListener {
 	 * @return the IDevice with the requested serial number if exists
 	 * @throws Exception
 	 */
-	public AndroidDevice getDevice(String deviceSerial) throws Exception {
+	public AbstractAndroidDevice getDevice(String deviceSerial) throws Exception {
 		return devices.get(deviceSerial);
 	}
 
@@ -104,7 +102,7 @@ public class AdbController implements IDeviceChangeListener {
 	 * @throws Exception
 	 */
 	public void printDevices() throws Exception {
-		for (AndroidDevice device : devices.values()) {
+		for (AbstractAndroidDevice device : devices.values()) {
 			System.out.println(device.toString());
 		}
 	}
@@ -159,19 +157,6 @@ public class AdbController implements IDeviceChangeListener {
 		this.communicationBus = communicationBus;
 	}
 
-	public int getTcpPort() {
-		return tcpPort;
-	}
-
-	/**
-	 * Set the port to connect the device (if in WIFI mode)
-	 * 
-	 * @param tcpPort
-	 */
-	public void setTcpPort(int tcpPort) {
-		this.tcpPort = tcpPort;
-	}
-
 	/**
 	 * Wait for device with the given serial to be connect or until timeout is
 	 * reached. The default timeout is 5 seconds
@@ -182,7 +167,7 @@ public class AdbController implements IDeviceChangeListener {
 	 * 
 	 *             If device was not connect until given timeout
 	 */
-	public AndroidDevice waitForDeviceToConnect(String serial) throws ConnectionException {
+	public USBDevice waitForDeviceToConnect(String serial) throws ConnectionException {
 		final long start = System.currentTimeMillis();
 		while (!devices.containsKey(serial)) {
 			if (System.currentTimeMillis() - start > timeoutForDeviceConnection) {
@@ -194,13 +179,13 @@ public class AdbController implements IDeviceChangeListener {
 				// Not important
 			}
 		}
-		return devices.get(serial);
+		return (USBDevice)devices.get(serial);
 	}
 
 	@Override
 	public void deviceConnected(IDevice device) {
 		try {
-			devices.put(device.getSerialNumber(), new AndroidDevice(adb, device));
+			devices.put(device.getSerialNumber(), new USBDevice(adb, device));
 		} catch (Exception e) {
 			logger.error("Failed to add device", e);
 		}

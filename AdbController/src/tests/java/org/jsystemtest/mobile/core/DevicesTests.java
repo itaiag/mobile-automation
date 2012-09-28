@@ -17,7 +17,7 @@ public class DevicesTests {
 	
 	@Test(timeout = 6000)
 	public void testConnectionToDevice() throws ConnectionException{
-		AndroidDevice device = adbController.waitForDeviceToConnect(SERIAL);
+		USBDevice device = adbController.waitForDeviceToConnect(SERIAL);
 		Assert.assertEquals(SERIAL, device.getSerialNumber());
 	}
 

@@ -1,16 +1,12 @@
 package org.jsystemtest.mobile.core;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
-import org.jsystemtest.mobile.core.AdbController.CommunicationBus;
 
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
@@ -18,25 +14,20 @@ import com.android.ddmlib.InstallException;
 import com.android.ddmlib.RawImage;
 import com.android.ddmlib.SyncService;
 
-public class AndroidDevice {
-
-	private final static Logger logger = Logger.getLogger(AndroidDevice.class);
-	private static int lastPort = 1234;
+public abstract class AbstractAndroidDevice {
+	private final static Logger logger = Logger.getLogger(AbstractAndroidDevice.class);
 	
-	private final AndroidDebugBridge adb;
-	private final IDevice device;
-	private int port;
+	protected final AndroidDebugBridge adb;
+	protected final IDevice device;
 
 	// Variables that we get from the AdbController
-	private final CommunicationBus communicationBus;
-	private final File adbLocation;
-	private final int tcpPort;
+	protected final File adbLocation;
+	
 
-	public AndroidDevice(AndroidDebugBridge adb, IDevice device) throws Exception {
+	public AbstractAndroidDevice(AndroidDebugBridge adb, IDevice device) throws Exception {
 		super();
 		this.adb = adb;
 		this.device = device;
-		port = lastPort++;
 
 		// Get Data from the AdbController
 		try {
@@ -45,8 +36,7 @@ public class AndroidDevice {
 			throw new Exception("Adb location was not set");
 		}
 
-		communicationBus = AdbController.getInstance().getCommunicationBus();
-		tcpPort = AdbController.getInstance().getTcpPort();
+		
 	}
 
 	/**
@@ -104,13 +94,6 @@ public class AndroidDevice {
 		return screenshotFile;
 	}
 
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
 
 	/**
 	 * Grab file from the device
@@ -144,73 +127,18 @@ public class AndroidDevice {
 		}
 	}
 
-	private void connectViaWifi() throws InterruptedException, Exception {
-		String cmd = "adb connect " + device.getSerialNumber() + ":" + tcpPort;
-		Runtime run = Runtime.getRuntime();
-		Process pr = run.exec(cmd);
-		pr.waitFor();
-		BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-		long startTime = System.currentTimeMillis();
-		while (!buf.ready() && System.currentTimeMillis() - startTime < 30000) {
-			Thread.sleep(500);
-		}
-		if (buf.ready()) {
-			char[] cbuf = new char[256];
-			buf.read(cbuf);
-			logger.debug(String.valueOf(cbuf));
-			Thread.sleep(1000);
-
-		} else {
-			Exception e = new Exception(
-					"Unable to communicate with the ADB try to kill the process (task manager) and re-run");
-			logger.error(e);
-			throw e;
-
-		}
-
-	}
-
-	private void connectViaUSB() {
-	}
-
-	public void connect() throws InterruptedException, Exception {
-		if (communicationBus.equals(CommunicationBus.WIFI)) {
-			connectViaWifi();
-		} else {
-			connectViaUSB();
-		}
-	}
+	public abstract void connect() throws ConnectionException;
+	
+	public abstract void disconnect();
+	
+	public abstract void runTestOnDevice(String pakageName, String testClassName, String testName) throws IOException;
 	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("Serial Number:").append(device.getSerialNumber()).append("\n");
-		sb.append("Port:").append(port).append("\n");
 		return sb.toString();
 	}
 	
-	public void disconnect(){
-//		String cmd = "adb disconnect " + device.getSerialNumber() + ":" + tcpPort;
-//		Runtime run = Runtime.getRuntime();
-//		Process pr = run.exec(cmd);
-//		pr.waitFor();
-//		BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-//		long startTime = System.currentTimeMillis();
-//		while (!buf.ready() && System.currentTimeMillis() - startTime < 30000) {
-//			Thread.sleep(500);
-//		}
-//		if (buf.ready()) {
-//			char[] cbuf = new char[256];
-//			buf.read(cbuf);
-//			logger.debug(String.valueOf(cbuf));
-//		} else {
-//			Exception e = new Exception(
-//					"Unable to communicate with the ADB try to kill the process (task manager) and re-run");
-//			logger.error(e);
-//			throw e;
-//
-//		}
-
-	}
 
 	/**
 	 * Push file to the device
@@ -238,39 +166,8 @@ public class AndroidDevice {
 	 * @param apkLocation
 	 * @throws InstallException
 	 */
-	public void installAPK(String apkLocation, boolean reinstall) throws InstallException {
-		device.installPackage(apkLocation, reinstall);
+	public abstract void installPackage(String apkLocation, boolean reinstall) throws InstallException;
 
-	}
-
-	/**
-	 * Limor B
-	 * 
-	 * Execute test on device.
-	 * 
-	 * @param pakageName
-	 * @param testClassName
-	 * @param testName
-	 * @throws Exception
-	 */
-	public void runTestOnDevice(String pakageName, String testClassName, String testName) throws Exception {
-
-		if (null == adbLocation || !adbLocation.exists()) {
-			throw new IOException("Can't find adb location");
-		}
-		String cmd = adbLocation.getAbsolutePath() + "\\adb -s " + device.getSerialNumber() + " shell am instrument -e class "
-				+ pakageName + "." + testClassName + "#" + testName + " " + pakageName
-				+ "/android.test.InstrumentationTestRunner";
-		Runtime run = Runtime.getRuntime();
-		Process pr = run.exec(cmd);
-		pr.waitFor();
-		Thread.sleep(TimeUnit.SECONDS.toMillis(2));
-		// getDevice(deviceIds).executeShellCommand("shell am instrument -e class "+pakageName+"."+testClassName+"#"+testName+" "+pakageName+"/android.test.InstrumentationTestRunner",new
-		// NullOutputReceiver());
-		// getDevice(deviceIds).executeShellCommand("am instrument -e class "+pakageName+"."+testClassName+"#"+testName+" "+pakageName+"/android.test.InstrumentationTestRunner",new
-		// NullOutputReceiver());
-		// Thread.sleep(TimeUnit.SECONDS.toMillis(2));
-	}
 
 	public boolean isOnline() {
 		return device.isOnline();
@@ -283,5 +180,4 @@ public class AndroidDevice {
 	public String getSerialNumber(){
 		return device.getSerialNumber();
 	}
-
 }

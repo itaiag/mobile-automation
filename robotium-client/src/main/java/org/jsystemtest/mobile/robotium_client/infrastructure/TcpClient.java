@@ -1,4 +1,4 @@
-package org.topq.mobile.robotium_client.infrastructure;
+package org.jsystemtest.mobile.robotium_client.infrastructure;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.topq.mobile.robotium_client.impl.RobotiumClientImpl;
+import org.jsystemtest.mobile.robotium_client.impl.RobotiumClientImpl;
 
 /**
  * <b>ADB TCP Client</b><br>
@@ -17,13 +17,13 @@ import org.topq.mobile.robotium_client.impl.RobotiumClientImpl;
  * @author topq
  *
  */
-public class AdbTcpClient {
+public class TcpClient {
 	private static Logger logger = Logger.getLogger(RobotiumClientImpl.class);
 	private final String host;
 	private final int port;
 	private String lastResult;
 
-	public AdbTcpClient(String host, int port) throws Exception {
+	public TcpClient(String host, int port) throws Exception {
 		this.host = host;
 		this.port = port;
 	}

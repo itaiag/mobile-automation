@@ -1,26 +1,26 @@
-package org.topq.mobile.robotium_client.impl;
+package org.jsystemtest.mobile.robotium_client.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import net.iharder.Base64;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.jsystemtest.mobile.core.AbstractAndroidDevice;
 import org.jsystemtest.mobile.core.AdbController;
-import org.jsystemtest.mobile.core.AndroidDevice;
 import org.jsystemtest.mobile.core.GeneralEnums;
+import org.jsystemtest.mobile.core.USBDevice;
+import org.jsystemtest.mobile.robotium_client.infrastructure.TcpClient;
 import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
 import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
-import org.topq.mobile.robotium_client.infrastructure.AdbTcpClient;
 
 public class RobotiumClientImpl implements MobileClintInterface {
 
-	private AdbTcpClient tcpClient;
-	private AndroidDevice device;
+	private TcpClient tcpClient;
+	private USBDevice device;
 	private static Logger logger = Logger.getLogger(RobotiumClientImpl.class);;
 	private static boolean getScreenshots = false;
 	private static int port = 6100;
@@ -32,7 +32,15 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	private static String testName = null;
 	private static final String RESULT_STRING = "RESULT";
 
-	public RobotiumClientImpl(String configFileName, boolean doDeply) throws Exception {
+	public RobotiumClientImpl(String configFileName) throws Exception {
+		this(configFileName, true);
+	}
+
+	public RobotiumClientImpl(String configFileName, boolean deployServer) throws Exception {
+		this(configFileName, deployServer, true);
+	}
+
+	public RobotiumClientImpl(String configFileName, boolean deployServer, boolean launchServer) throws Exception {
 		final File configFile = new File(configFileName);
 		if (!configFile.exists()) {
 			throw new IOException("Configuration file was not found in " + configFileName);
@@ -43,12 +51,11 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		try {
 			in = new FileInputStream(configFile);
 			configProperties.load(in);
-			
-		}finally {
+
+		} finally {
 			in.close();
 		}
-		
-		
+
 		port = Integer.parseInt(configProperties.getProperty("Port"));
 		logger.debug("In Properties file port is:" + port);
 
@@ -56,7 +63,6 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		logger.debug("In Properties file device serial is:" + deviceSerial);
 
 		apkLocation = configProperties.getProperty("ApkLocation");
-		;
 		logger.debug("APK location is:" + apkLocation);
 
 		pakageName = configProperties.getProperty("PakageName");
@@ -72,16 +78,16 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		logger.debug("Host  Name is:" + host);
 
 		device = AdbController.getInstance().waitForDeviceToConnect(deviceSerial);
-		if (doDeply) {
-			// String serverConfFileLocation =
-			// pro.getProperty("ServerConfFile");
-			device.installAPK(apkLocation, true);
+		if (deployServer) {
+			device.installPackage(apkLocation, true);
 			// TODO: Handle the configuration file via push
 		}
-		device.runTestOnDevice(pakageName, testClassName, testName);
+		if (launchServer) {
+			device.runTestOnDevice(pakageName, testClassName, testName);
+		}
 		logger.info("Start server on device");
 		setPortForwarding();
-		tcpClient = new AdbTcpClient(host, port);
+		tcpClient = new TcpClient(host, port);
 	}
 
 	/**
@@ -217,16 +223,10 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	}
 
 	private void setPortForwarding() throws Exception {
-		if (device.isOnline()) {
-			device.setPortForwarding(port, GeneralEnums.SERVERPORT);
-		} else {
-			Exception e = new Exception("Unable to perform port forwarding - " + deviceSerial + " is not online");
-			logger.error(e);
-			throw e;
-		}
+		device.setPortForwarding(port, GeneralEnums.SERVERPORT);
 	}
 
-	private AndroidDevice getDevice() throws Exception {
+	public AbstractAndroidDevice getDevice() throws Exception {
 		return device;
 	}
 

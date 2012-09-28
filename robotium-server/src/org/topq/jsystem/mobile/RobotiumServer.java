@@ -20,8 +20,8 @@ public class RobotiumServer extends ActivityInstrumentationTestCase2 implements 
 
 		try {
 			confUtil = ConfUtil.getInstance();
-			Log.i(TAG, "CLass name to launch is:" + confUtil.getConffigParmters("LAUNCHER_ACTIVITY_FULL_CLASSNAME"));
-			launcherActivityClass = Class.forName(confUtil.getConffigParmters("LAUNCHER_ACTIVITY_FULL_CLASSNAME"));
+			Log.i(TAG, "CLass name to launch is:" + confUtil.getConfigParameters("LAUNCHER_ACTIVITY_FULL_CLASSNAME"));
+			launcherActivityClass = Class.forName(confUtil.getConfigParameters("LAUNCHER_ACTIVITY_FULL_CLASSNAME"));
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG, "Failed to load class " + e.getMessage());
 			e.printStackTrace();
@@ -31,8 +31,8 @@ public class RobotiumServer extends ActivityInstrumentationTestCase2 implements 
 	private Thread serverThread;
 
 	public RobotiumServer() {
-		super(confUtil.getConffigParmters("TARGET_PACKAGE_ID"), launcherActivityClass);
-		Log.i(TAG, "Target package ID is:" + confUtil.getConffigParmters("TARGET_PACKAGE_ID"));
+		super(confUtil.getConfigParameters("TARGET_PACKAGE_ID"), launcherActivityClass);
+		Log.i(TAG, "Target package ID is:" + confUtil.getConfigParameters("TARGET_PACKAGE_ID"));
 	}
 
 	public void testMain() throws InterruptedException {
