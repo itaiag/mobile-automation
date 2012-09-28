@@ -1,4 +1,4 @@
-package org.topq.mobile.frank_client.interfaces;
+package org.jsystemtest.mobile.frank_client.interfaces;
 /**
  * 
  * @author Bortman Limor

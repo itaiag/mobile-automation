@@ -1,4 +1,4 @@
-package org.topq.mobile.frank_ssh;
+package org.jsystemtest.mobile.frank_ssh;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,8 +10,8 @@ import net.schmizz.sshj.xfer.FileSystemFile;
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer;
 
 import org.apache.log4j.Logger;
-import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
-import org.topq.mobile.frank_client.imp.FrankClientImpl;
+import org.jsystemtest.mobile.common_mobile.client.interfaces.MobileClintInterface;
+import org.jsystemtest.mobile.frank_client.imp.FrankClientImpl;
 
 import com.dhemery.configuring.Configuration;
 import com.dhemery.victor.IosDevice;

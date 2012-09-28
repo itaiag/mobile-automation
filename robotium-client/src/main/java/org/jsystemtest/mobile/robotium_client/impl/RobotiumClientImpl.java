@@ -9,13 +9,13 @@ import net.iharder.Base64;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.jsystemtest.mobile.common_mobile.client.enums.HardwareButtons;
+import org.jsystemtest.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.jsystemtest.mobile.core.AbstractAndroidDevice;
 import org.jsystemtest.mobile.core.AdbController;
 import org.jsystemtest.mobile.core.GeneralEnums;
 import org.jsystemtest.mobile.core.USBDevice;
 import org.jsystemtest.mobile.robotium_client.infrastructure.TcpClient;
-import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
-import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
 
 public class RobotiumClientImpl implements MobileClintInterface {
 

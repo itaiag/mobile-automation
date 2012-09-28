@@ -25,7 +25,7 @@
 			<version>1.2.16</version>
 		</dependency>
 		<dependency>
-			 <groupId>org.topq.mobile</groupId>
+			 <groupId>org.jsystemtest.mobile</groupId>
  			 <artifactId>common-mobile</artifactId>
   			<version>0.0.1-SNAPSHOT</version>
 		</dependency>

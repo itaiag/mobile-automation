@@ -1,11 +1,11 @@
-package org.topq.mobile.frank_client.imp;
+package org.jsystemtest.mobile.frank_client.imp;
 
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
-import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
-import org.topq.mobile.frank_ssh.SshIosDevice;
+import org.jsystemtest.mobile.common_mobile.client.enums.HardwareButtons;
+import org.jsystemtest.mobile.common_mobile.client.interfaces.MobileClintInterface;
+import org.jsystemtest.mobile.frank_ssh.SshIosDevice;
 
 import com.dhemery.configuring.Configuration;
 import com.dhemery.configuring.LoadProperties;

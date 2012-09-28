@@ -1,8 +1,8 @@
-package org.topq.mobile.common_mobile.client.interfaces;
+package org.jsystemtest.mobile.common_mobile.client.interfaces;
 
 import java.io.File;
 
-import org.topq.mobile.common_mobile.client.enums.HardwareButtons;
+import org.jsystemtest.mobile.common_mobile.client.enums.HardwareButtons;
 
 /**
  * 

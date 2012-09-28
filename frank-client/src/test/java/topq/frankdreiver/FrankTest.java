@@ -1,8 +1,8 @@
 package topq.frankdreiver;
 
+import org.jsystemtest.mobile.common_mobile.client.interfaces.MobileClintInterface;
+import org.jsystemtest.mobile.frank_client.imp.FrankClientImpl;
 import org.junit.Test;
-import org.topq.mobile.common_mobile.client.interfaces.MobileClintInterface;
-import org.topq.mobile.frank_client.imp.FrankClientImpl;
 
 /**
  * 
