@@ -3,7 +3,7 @@ package org.jsystemtest.mobile.core;
 public class GeneralEnums {
 
 	public static int SERVERPORT = 4321;
-
+	
 	public final static String SD_LOCATION = "mnt/sdcard/";
 	public final static String SD_TOUCH_LOCATION = "mnt/sdcard/Touch";
 	public final static String LOG_FILE_NAME = "log.txt";
