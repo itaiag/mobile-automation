@@ -8,7 +8,7 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="com.example.android.notepad" />
+        android:targetPackage="com.gettaxi.android" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application

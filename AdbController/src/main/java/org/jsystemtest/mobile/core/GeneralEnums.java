@@ -3,6 +3,7 @@ package org.jsystemtest.mobile.core;
 public class GeneralEnums {
 
 	public static int SERVERPORT = 4321;
+
 	
 	public final static String SD_LOCATION = "mnt/sdcard/";
 	public final static String SD_TOUCH_LOCATION = "mnt/sdcard/Touch";
@@ -13,4 +14,5 @@ public class GeneralEnums {
 	public final static String EXTRA_FILE_PATH = "file_path";
 
 	public final static String ENUMS_PACKAGE = "com.nuvoton.common.enums.";
+
 }
