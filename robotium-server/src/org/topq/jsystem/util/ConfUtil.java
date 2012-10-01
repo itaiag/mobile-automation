@@ -21,7 +21,7 @@ public class ConfUtil {
 	private Map<String, String> confMap = null;
 	private static ConfUtil confUtil = null;
 	private static final String TAG = "ConfUtil";
-	private static final String CONFIG_FILE = "/mnt/sdcard/conf.txt";
+	private static final String CONFIG_FILE = "/data/conf.txt";
 
 	/**
 	 * Search for config file from the following properties: <br>
@@ -47,7 +47,9 @@ public class ConfUtil {
 			// init all the configuration
 			File config = new File(CONFIG_FILE);
 			if (!config.exists()) {
-				throw new IOException("No config file found: " + CONFIG_FILE);
+				String error = "No config file found: " + CONFIG_FILE;
+				Log.e(TAG,error);
+				throw new IOException(error);
 			}
 			in = new FileInputStream(config);
 
@@ -59,9 +61,6 @@ public class ConfUtil {
 				confMap.put(line.split("=")[0].trim(), line.split("=")[1].trim());
 			}
 
-		} catch (IOException e) {
-			Log.e(TAG, "Failed to open " + CONFIG_FILE + " " + e.getMessage());
-			e.printStackTrace();
 		} finally {
 			if (null != in) {
 				in.close();
@@ -73,14 +72,13 @@ public class ConfUtil {
 
 	}
 
-	public static ConfUtil getInstance() {
+	public static ConfUtil getInstance() throws IOException {
 		if (confUtil == null) {
 			try {
 				confUtil = new ConfUtil();
 			} catch (IOException e) {
 				Log.e(TAG, "Failed to Create confUtil  " + e.getMessage());
-				e.printStackTrace();
-
+				throw e;
 			}
 		}
 		return confUtil;

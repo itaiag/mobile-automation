@@ -133,7 +133,7 @@ public abstract class AbstractAndroidDevice {
 	
 	public abstract void disconnect();
 	
-	public abstract void runTestOnDevice(String pakageName, String testClassName, String testName) throws IOException;
+	public abstract void runTestOnDevice(String pakageName, String testClassName, String testName) throws IOException, Exception;
 	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
@@ -152,10 +152,9 @@ public abstract class AbstractAndroidDevice {
 	 *            file name on the device
 	 * @throws Exception
 	 */
-	public void pushFileToDevice(String fileLocation, String fileName, String localLocation) throws Exception {
+	public void pushFileToDevice(String remotefileLocation, String localLocation) throws Exception {
 		try {
-			device.getSyncService().pushFile(localLocation, fileLocation + "/" + fileName,
-					SyncService.getNullProgressMonitor());
+			device.getSyncService().pushFile(localLocation, remotefileLocation,SyncService.getNullProgressMonitor());
 		} catch (Exception e) {
 			logger.error("Exception ", e);
 			throw e;

@@ -38,10 +38,16 @@ public class SoloExecutor {
 		this.instrumentation = instrumentation;
 	}
 
-	public JSONObject execute(final String data) throws JSONException, IOException {
-		ScriptParser parser;
+	public JSONObject execute(final String data) throws JSONException  {
+		ScriptParser parser = null;
 		JSONObject result = new JSONObject();
-		parser = new ScriptParser(data);
+		try{
+			parser = new ScriptParser(data);
+		}catch (JSONException e) {
+			result.put(RESULT_STRING, hendelException(" new ScriptParser("+data+")",e));
+			return result;
+
+		}
 		Log.d(TAG, data);
 		for (CommandParser command : parser.getCommands()) {
 			if (command.getCommand().equals("enterText")) {
@@ -83,10 +89,11 @@ public class SoloExecutor {
 				result.put(RESULT_STRING, activateIntent(command.getArguments()));
 			}
 		}
-
+		Log.e(TAG,"The Result is:"+result);
 		return result;
 
 	}
+
 
 	private String activateIntent(JSONArray arguments) {
 		String command = null;
@@ -126,14 +133,13 @@ public class SoloExecutor {
 			 * solo.getCurrentActivity().startActivity(sendIntent); }
 			 */
 		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
+			hendelException(command, e);
 			return null;
 		}
 		return SUCCESS_STRING + command;
 	}
 
-	private JSONObject pull(JSONArray arguments) throws IOException {
+	private JSONObject pull(JSONArray arguments) {
 		String command = "the command  pull";
 		String allText = "";
 		JSONObject result = null;
@@ -153,15 +159,10 @@ public class SoloExecutor {
 			result.put("file", allText);
 			in.close();
 			fstream.close();
-		} catch (IOException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
+		} catch (Exception e) {
+			hendelException(command, e);
 			return null;
-		}
+		} 
 		return result;
 	}
 
@@ -182,14 +183,8 @@ public class SoloExecutor {
 				out.close();
 			}
 			Log.d(TAG, "run the command:" + command);
-		} catch (IOException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
+		} catch (Exception e){
+			return hendelException(command, e);
 		}
 		return SUCCESS_STRING + command;
 	}
@@ -205,14 +200,9 @@ public class SoloExecutor {
 			for (int i = 0; i < textViews.size(); i++) {
 				response.append(i).append(",").append(textViews.get(i).getText().toString()).append(";");
 			}
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		} catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command + ",Response: " + response.toString();
 	}
 
@@ -222,15 +212,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + arguments.getInt(0) + ")";
 			response = solo.getCurrentTextViews(null).get(arguments.getInt(0)).getText().toString();
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command + ",Response: " + response;
 	}
 
@@ -245,15 +229,9 @@ public class SoloExecutor {
 					response.append(i).append(";");
 				}
 			}
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		} catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command + ",Response: " + response.toString();
 	}
 
@@ -263,15 +241,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + arguments.getString(0) + ")";
 			response = solo.getText(arguments.getInt(0)).getText().toString();
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command + ",Response: " + response;
 	}
 
@@ -280,15 +252,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clickOnMenuItem(arguments.getString(0));
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 	}
 
@@ -297,14 +263,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + arguments.getString(0) + ")";
 			solo.sendKey(arguments.getInt(0));
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 	}
 
@@ -313,14 +274,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clickOnView(solo.getCurrentViews().get((arguments.getInt(0))));
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 	}
 
@@ -329,14 +285,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clickOnButton(arguments.getString(0));
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		} catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 	}
 
@@ -345,14 +296,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clearEditText(arguments.getInt(0));
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 	}
 
@@ -361,14 +307,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clickInList(arguments.getInt(0));
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 
 	}
@@ -378,14 +319,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + params.getString(0) + ")";
 			solo.clickOnButton(params.getInt(0));
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 	}
 
@@ -394,14 +330,9 @@ public class SoloExecutor {
 		try {
 			command += "(" + params.getString(0) + ")";
 			solo.enterText(params.getInt(0), params.getString(1));
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 
 	}
@@ -412,14 +343,9 @@ public class SoloExecutor {
 			command += "(" + params.getString(0) + ")";
 			solo.clickOnText(params.getString(0));
 
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		}  catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 
 	}
@@ -430,14 +356,9 @@ public class SoloExecutor {
 			command += "(" + keyString.getString(0) + ")";
 			int key = (keyString.getString(0) == "HOME") ? KeyEvent.KEYCODE_HOME : KeyEvent.KEYCODE_BACK;
 			instrumentation.sendKeyDownUpSync(key);
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		} catch (JSONException e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-		}
+		} catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + "click on hardware";
 	}
 
@@ -446,13 +367,18 @@ public class SoloExecutor {
 		String command = "the command  launch";
 		try {
 			solo = soloProvider.getSolo();
-		} catch (Error e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		}
+		} catch (Throwable e) {
+			return hendelException(command, e);
+		} 
 		return SUCCESS_STRING + command;
 
+	}
+	
+
+	private String hendelException(final String command,Throwable e) {
+		String error =ERROR_STRING + command+" failed due to " + e.getStackTrace();
+		Log.e(TAG,error);
+		return error;
 	}
 
 }

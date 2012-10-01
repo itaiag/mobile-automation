@@ -31,6 +31,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	private static String host = null;
 	private static String testName = null;
 	private static final String RESULT_STRING = "RESULT";
+	private static final String CONFIG_FILE = "/data/conf.txt";
 
 	public RobotiumClientImpl(String configFileName) throws Exception {
 		this(configFileName, true);
@@ -80,7 +81,9 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		device = AdbController.getInstance().waitForDeviceToConnect(deviceSerial);
 		if (deployServer) {
 			device.installPackage(apkLocation, true);
-			// TODO: Handle the configuration file via push
+			String serverConfFile = configProperties.getProperty("ServerConfFile");
+			logger.debug("Server Conf File:" + serverConfFile);
+			device.pushFileToDevice(CONFIG_FILE,serverConfFile);
 		}
 		if (launchServer) {
 			device.runTestOnDevice(pakageName, testClassName, testName);
@@ -135,6 +138,9 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		logger.info("Send Data to " + device.getSerialNumber());
 
 		try {
+			if(tcpClient.sendData(jsonobj)==null){
+				throw new Exception("No data recvied from server! pleas check server log!");
+			}
 			result = new JSONObject(tcpClient.sendData(jsonobj));
 		} catch (Exception e) {
 			logger.error("Failed to send / receive data", e);

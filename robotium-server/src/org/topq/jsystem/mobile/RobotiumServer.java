@@ -1,5 +1,7 @@
 package org.topq.jsystem.mobile;
 
+import java.io.IOException;
+
 import org.json.JSONObject;
 import org.topq.jsystem.util.ConfUtil;
 
@@ -24,7 +26,10 @@ public class RobotiumServer extends ActivityInstrumentationTestCase2 implements 
 			launcherActivityClass = Class.forName(confUtil.getConfigParameters("LAUNCHER_ACTIVITY_FULL_CLASSNAME"));
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG, "Failed to load class " + e.getMessage());
-			e.printStackTrace();
+			System.exit(200);
+		} catch (IOException e) {
+			Log.e(TAG, "Failed to find config file: " + e.getMessage());
+			System.exit(100);
 		}
 	}
 
