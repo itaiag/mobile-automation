@@ -44,7 +44,7 @@ public class SoloExecutor {
 		try{
 			parser = new ScriptParser(data);
 		}catch (JSONException e) {
-			result.put(RESULT_STRING, hendelException(" new ScriptParser("+data+")",e));
+			result.put(RESULT_STRING, handleException(" new ScriptParser("+data+")",e));
 			return result;
 
 		}
@@ -133,7 +133,7 @@ public class SoloExecutor {
 			 * solo.getCurrentActivity().startActivity(sendIntent); }
 			 */
 		} catch (JSONException e) {
-			hendelException(command, e);
+			handleException(command, e);
 			return null;
 		}
 		return SUCCESS_STRING + command;
@@ -160,7 +160,7 @@ public class SoloExecutor {
 			in.close();
 			fstream.close();
 		} catch (Exception e) {
-			hendelException(command, e);
+			handleException(command, e);
 			return null;
 		} 
 		return result;
@@ -184,7 +184,7 @@ public class SoloExecutor {
 			}
 			Log.d(TAG, "run the command:" + command);
 		} catch (Exception e){
-			return hendelException(command, e);
+			return handleException(command, e);
 		}
 		return SUCCESS_STRING + command;
 	}
@@ -201,7 +201,7 @@ public class SoloExecutor {
 				response.append(i).append(",").append(textViews.get(i).getText().toString()).append(";");
 			}
 		} catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command + ",Response: " + response.toString();
 	}
@@ -213,7 +213,7 @@ public class SoloExecutor {
 			command += "(" + arguments.getInt(0) + ")";
 			response = solo.getCurrentTextViews(null).get(arguments.getInt(0)).getText().toString();
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command + ",Response: " + response;
 	}
@@ -230,7 +230,7 @@ public class SoloExecutor {
 				}
 			}
 		} catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command + ",Response: " + response.toString();
 	}
@@ -242,7 +242,7 @@ public class SoloExecutor {
 			command += "(" + arguments.getString(0) + ")";
 			response = solo.getText(arguments.getInt(0)).getText().toString();
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command + ",Response: " + response;
 	}
@@ -253,7 +253,7 @@ public class SoloExecutor {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clickOnMenuItem(arguments.getString(0));
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 	}
@@ -264,7 +264,7 @@ public class SoloExecutor {
 			command += "(" + arguments.getString(0) + ")";
 			solo.sendKey(arguments.getInt(0));
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 	}
@@ -275,7 +275,7 @@ public class SoloExecutor {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clickOnView(solo.getCurrentViews().get((arguments.getInt(0))));
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 	}
@@ -286,7 +286,7 @@ public class SoloExecutor {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clickOnButton(arguments.getString(0));
 		} catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 	}
@@ -297,7 +297,7 @@ public class SoloExecutor {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clearEditText(arguments.getInt(0));
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 	}
@@ -308,7 +308,7 @@ public class SoloExecutor {
 			command += "(" + arguments.getString(0) + ")";
 			solo.clickInList(arguments.getInt(0));
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 
@@ -320,7 +320,7 @@ public class SoloExecutor {
 			command += "(" + params.getString(0) + ")";
 			solo.clickOnButton(params.getInt(0));
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 	}
@@ -331,7 +331,7 @@ public class SoloExecutor {
 			command += "(" + params.getString(0) + ")";
 			solo.enterText(params.getInt(0), params.getString(1));
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 
@@ -344,7 +344,7 @@ public class SoloExecutor {
 			solo.clickOnText(params.getString(0));
 
 		}  catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 
@@ -357,7 +357,7 @@ public class SoloExecutor {
 			int key = (keyString.getString(0) == "HOME") ? KeyEvent.KEYCODE_HOME : KeyEvent.KEYCODE_BACK;
 			instrumentation.sendKeyDownUpSync(key);
 		} catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + "click on hardware";
 	}
@@ -368,14 +368,14 @@ public class SoloExecutor {
 		try {
 			solo = soloProvider.getSolo();
 		} catch (Throwable e) {
-			return hendelException(command, e);
+			return handleException(command, e);
 		} 
 		return SUCCESS_STRING + command;
 
 	}
 	
 
-	private String hendelException(final String command,Throwable e) {
+	private String handleException(final String command,Throwable e) {
 		String error =ERROR_STRING + command+" failed due to " + e.getStackTrace();
 		Log.e(TAG,error);
 		return error;
