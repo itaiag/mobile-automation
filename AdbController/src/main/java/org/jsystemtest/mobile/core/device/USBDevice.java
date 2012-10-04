@@ -2,7 +2,6 @@ package org.jsystemtest.mobile.core.device;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +18,6 @@ public class USBDevice extends AbstractAndroidDevice {
 
 	public USBDevice(AndroidDebugBridge adb, IDevice device) throws Exception {
 		super(adb, device);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -63,9 +61,8 @@ public class USBDevice extends AbstractAndroidDevice {
 		if (null == adbLocation || !adbLocation.exists()) {
 			throw new IOException("Can't find adb location");
 		}
-		String cmd = adbLocation.getAbsolutePath() + "\\adb -s "
-				+ device.getSerialNumber() + " shell am instrument -e class "
-				+ pakageName + "." + testClassName + "#" + testName + " "
+		String cmd = adbLocation.getAbsolutePath() + "\\adb -s " + device.getSerialNumber()
+				+ " shell am instrument -e class " + pakageName + "." + testClassName + "#" + testName + " "
 				+ pakageName + "/android.test.InstrumentationTestRunner";
 		logger.info("Try to run command:" + cmd);
 		Runtime run = Runtime.getRuntime();
@@ -77,15 +74,14 @@ public class USBDevice extends AbstractAndroidDevice {
 			String s;
 			String allBuffer = " ";
 			while ((s = stdInput.readLine()) != null) {
-				allBuffer+=s;
-			} 
-			if(allBuffer.contains("Exception")){
+				allBuffer += s;
+			}
+			if (allBuffer.contains("Exception")) {
 				Exception e = new Exception(allBuffer);
 				logger.error(e);
 				throw e;
 			}
-			
-			
+
 		} catch (InterruptedException e) {
 			// Don't care
 		}
