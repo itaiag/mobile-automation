@@ -2,7 +2,6 @@ package org.jsystemtest.mobile.core.device;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +18,6 @@ public class USBDevice extends AbstractAndroidDevice {
 
 	public USBDevice(AndroidDebugBridge adb, IDevice device) throws Exception {
 		super(adb, device);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -56,7 +54,7 @@ public class USBDevice extends AbstractAndroidDevice {
 	 * @param pakageName
 	 * @param testClassName
 	 * @param testName
-	 * @throws Exception
+	 * @throws IOException,Exception
 	 */
 	public void runTestOnDevice(String pakageName, String testClassName, String testName) throws Exception {
 
@@ -75,16 +73,15 @@ public class USBDevice extends AbstractAndroidDevice {
 			Thread.sleep(TimeUnit.SECONDS.toMillis(2));
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 			String s;
-			String allBuffer = " ";
+			StringBuilder  allBuffer = new StringBuilder(); 
 			while ((s = stdInput.readLine()) != null) {
-				allBuffer+=s;
+				allBuffer.append(s);
 			} 
-			if(allBuffer.contains("Exception")){
-				Exception e = new Exception(allBuffer);
+			if(allBuffer.indexOf("Exception")!=-1){
+				Exception e = new Exception(allBuffer.toString());
 				logger.error(e);
 				throw e;
 			}
-			
 			
 		} catch (InterruptedException e) {
 			// Don't care
