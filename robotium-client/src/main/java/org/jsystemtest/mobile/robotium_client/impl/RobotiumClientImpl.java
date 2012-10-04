@@ -57,6 +57,24 @@ public class RobotiumClientImpl implements MobileClintInterface {
 			in.close();
 		}
 
+		readConfigFile(configProperties);
+
+		device = AdbController.getInstance().waitForDeviceToConnect(deviceSerial);
+		if (deployServer) {
+			device.installPackage(apkLocation, true);
+			String serverConfFile = configProperties.getProperty("ServerConfFile");
+			logger.debug("Server Conf File:" + serverConfFile);
+			device.pushFileToDevice(CONFIG_FILE,serverConfFile);
+		}
+		if (launchServer) {
+			device.runTestOnDevice(pakageName, testClassName, testName);
+		}
+		logger.info("Start server on device");
+		setPortForwarding();
+		tcpClient = new TcpClient(host, port);
+	}
+
+	private void readConfigFile(Properties configProperties) {
 		port = Integer.parseInt(configProperties.getProperty("Port"));
 		logger.debug("In Properties file port is:" + port);
 
@@ -77,20 +95,6 @@ public class RobotiumClientImpl implements MobileClintInterface {
 
 		host = configProperties.getProperty("Host");
 		logger.debug("Host  Name is:" + host);
-
-		device = AdbController.getInstance().waitForDeviceToConnect(deviceSerial);
-		if (deployServer) {
-			device.installPackage(apkLocation, true);
-			String serverConfFile = configProperties.getProperty("ServerConfFile");
-			logger.debug("Server Conf File:" + serverConfFile);
-			device.pushFileToDevice(CONFIG_FILE,serverConfFile);
-		}
-		if (launchServer) {
-			device.runTestOnDevice(pakageName, testClassName, testName);
-		}
-		logger.info("Start server on device");
-		setPortForwarding();
-		tcpClient = new TcpClient(host, port);
 	}
 
 	/**
