@@ -240,4 +240,19 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		return device;
 	}
 
+	public void closeActivity() throws Exception {
+		sendData("closeActivity");
+	}
+	
+	public String clickInControlByIndex(String controlName, int indexToClickOn) throws Exception{
+		return sendData("clickInControlByIndex", controlName, Integer.toString(indexToClickOn));
+	}
+	
+	public String isViewVisible(String viewName) throws Exception{
+		return sendData("isViewVisible", viewName);
+	}
+	
+	public void close(){
+		tcpClient.close();
+	}
 }
