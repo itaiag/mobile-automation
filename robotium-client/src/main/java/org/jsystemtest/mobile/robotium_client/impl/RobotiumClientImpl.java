@@ -187,10 +187,11 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		logger.info("Send Data to " + device.getSerialNumber());
 
 		try {
-			if (tcpClient.sendData(jsonobj) == null) {
+			String resultStr = null;
+			if ((resultStr = tcpClient.sendData(jsonobj)) == null) {
 				throw new Exception("No data recvied from server! pleas check server log!");
 			}
-			result = new JSONObject(tcpClient.sendData(jsonobj));
+			result = new JSONObject(resultStr);
 		} catch (Exception e) {
 			logger.error("Failed to send / receive data", e);
 			throw e;
@@ -298,6 +299,5 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	}
 	
 	public void close(){
-		tcpClient.close();
 	}
 }
