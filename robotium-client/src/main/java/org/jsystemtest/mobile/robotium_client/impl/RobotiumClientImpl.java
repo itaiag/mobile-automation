@@ -12,26 +12,31 @@ import org.json.JSONObject;
 import org.jsystemtest.mobile.common_mobile.client.enums.HardwareButtons;
 import org.jsystemtest.mobile.common_mobile.client.interfaces.MobileClintInterface;
 import org.jsystemtest.mobile.core.AdbController;
+import org.jsystemtest.mobile.core.ConnectionException;
 import org.jsystemtest.mobile.core.GeneralEnums;
 import org.jsystemtest.mobile.core.device.AbstractAndroidDevice;
 import org.jsystemtest.mobile.core.device.USBDevice;
 import org.jsystemtest.mobile.robotium_client.infrastructure.TcpClient;
 
+import com.android.ddmlib.InstallException;
+
 public class RobotiumClientImpl implements MobileClintInterface {
+
+	private static Logger logger = Logger.getLogger(RobotiumClientImpl.class);;
+
+	private static final String SERVER_PACKAGE_NAME = "org.topq.jsystem.mobile";
+	private static final String SERVER_CLASS_NAME = "RobotiumServer";
+	private static final String SERVER_TEST_NAME = "testMain";
+	private static final String RESULT_STRING = "RESULT";
+	private static final String CONFIG_FILE = "/data/conf.txt";
 
 	private TcpClient tcpClient;
 	private USBDevice device;
-	private static Logger logger = Logger.getLogger(RobotiumClientImpl.class);;
 	private static boolean getScreenshots = false;
-	private static int port = 6100;
+	private static int port = 4321;
 	private static String deviceSerial;
 	private static String apkLocation = null;
-	private static String pakageName = null;
-	private static String testClassName = null;
-	private static String host = null;
-	private static String testName = null;
-	private static final String RESULT_STRING = "RESULT";
-	private static final String CONFIG_FILE = "/data/conf.txt";
+	private static String host = "localhost";
 
 	public RobotiumClientImpl(String configFileName) throws Exception {
 		this(configFileName, true);
@@ -39,6 +44,13 @@ public class RobotiumClientImpl implements MobileClintInterface {
 
 	public RobotiumClientImpl(String configFileName, boolean deployServer) throws Exception {
 		this(configFileName, deployServer, true);
+	}
+
+	public RobotiumClientImpl(Properties configProperties, boolean deployServer, boolean launchServer)
+			throws InstallException, Exception {
+		readConfigFile(configProperties);
+		launchClient();
+		launchServer(deployServer, launchServer, configProperties);
 	}
 
 	public RobotiumClientImpl(String configFileName, boolean deployServer, boolean launchServer) throws Exception {
@@ -54,47 +66,80 @@ public class RobotiumClientImpl implements MobileClintInterface {
 			configProperties.load(in);
 
 		} finally {
-			in.close();
+			if (in != null){
+				in.close();
+			}
+			
 		}
 
 		readConfigFile(configProperties);
+		launchClient();
+		launchServer(deployServer, launchServer, configProperties);
 
+	}
+
+	private void launchClient() throws ConnectionException, Exception {
 		device = AdbController.getInstance().waitForDeviceToConnect(deviceSerial);
-		if (deployServer) {
-			device.installPackage(apkLocation, true);
-			String serverConfFile = configProperties.getProperty("ServerConfFile");
-			logger.debug("Server Conf File:" + serverConfFile);
-			device.pushFileToDevice(CONFIG_FILE,serverConfFile);
-		}
-		if (launchServer) {
-			device.runTestOnDevice(pakageName, testClassName, testName);
-		}
-		logger.info("Start server on device");
 		setPortForwarding();
 		tcpClient = new TcpClient(host, port);
 	}
 
-	private void readConfigFile(Properties configProperties) {
-		port = Integer.parseInt(configProperties.getProperty("Port"));
-		logger.debug("In Properties file port is:" + port);
+	private void launchServer(boolean deployServer, boolean launchServer, Properties configProperties)
+			throws InstallException, Exception {
+		if (deployServer) {
+			logger.info("About to deploy server on device");
+			device.installPackage(apkLocation, true);
+			String serverConfFile = configProperties.getProperty("ServerConfFile");
+			logger.debug("Server Conf File:" + serverConfFile);
+			device.pushFileToDevice(CONFIG_FILE, serverConfFile);
+		}
+		if (launchServer) {
+			logger.info("About to launch server on device");
+			device.runTestOnDevice(SERVER_PACKAGE_NAME, SERVER_CLASS_NAME, SERVER_TEST_NAME);
+		}
+	}
 
+	/**
+	 * Read all the details from the given properties and populate the object
+	 * members.
+	 * 
+	 * @param configProperties
+	 */
+	private void readConfigFile(final Properties configProperties) {
+		if (isPropertyExist(configProperties, "Port")) {
+			port = Integer.parseInt(configProperties.getProperty("Port"));
+		}
+		logger.debug("Port is set to" + port);
+
+		if (!isPropertyExist(configProperties, "DeviceSerail")) {
+			throw new IllegalStateException("Device serial is not specify in config file");
+		}
 		deviceSerial = configProperties.getProperty("DeviceSerail");
-		logger.debug("In Properties file device serial is:" + deviceSerial);
 
-		apkLocation = configProperties.getProperty("ApkLocation");
-		logger.debug("APK location is:" + apkLocation);
+		logger.debug("Device serial is set to" + deviceSerial);
 
-		pakageName = configProperties.getProperty("PakageName");
-		logger.debug("Pakage Name is:" + pakageName);
+		if (isPropertyExist(configProperties, "ApkLocation")) {
+			apkLocation = configProperties.getProperty("ApkLocation");
+		}
+		logger.debug("APK location is set to:" + apkLocation);
 
-		testClassName = configProperties.getProperty("TestClassName");
-		logger.debug("Test Class Name is:" + testClassName);
+		if (isPropertyExist(configProperties, "Host")) {
+			host = configProperties.getProperty("Host");
+		}
+		logger.debug("Host is set to" + host);
+	}
 
-		testName = configProperties.getProperty("TestName");
-		logger.debug("Test  Name is:" + testName);
-
-		host = configProperties.getProperty("Host");
-		logger.debug("Host  Name is:" + host);
+	/**
+	 * Check if the property with the specified key exists in the specified
+	 * properties object.
+	 * 
+	 * @param configProperties
+	 * @param key
+	 * @return true if and only if the property with the specified key exists.
+	 */
+	private boolean isPropertyExist(Properties configProperties, String key) {
+		final String value = configProperties.getProperty(key);
+		return value != null && !value.isEmpty();
 	}
 
 	/**
@@ -142,7 +187,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		logger.info("Send Data to " + device.getSerialNumber());
 
 		try {
-			if(tcpClient.sendData(jsonobj)==null){
+			if (tcpClient.sendData(jsonobj) == null) {
 				throw new Exception("No data recvied from server! pleas check server log!");
 			}
 			result = new JSONObject(tcpClient.sendData(jsonobj));
