@@ -55,18 +55,21 @@ public class TcpServer implements Runnable {
 	public void run() {
 		ServerSocket serverSocket = null;
 		Socket clientSocket = null;
+		PrintWriter out = null;
+		BufferedReader in = null;
 		try {
-			serverSocket = new ServerSocket(PORT);
+			serverSocket = new ServerSocket(4321);
+			String line = null;
+			Log.d(TAG, "Server is waiting for connection");
+			clientSocket = serverSocket.accept();
 			do {
-				Log.d(TAG, "Server is waiting for connection");
-				clientSocket = serverSocket.accept();
-				PrintWriter out = null;
-				BufferedReader in = null;
+				out = new PrintWriter(clientSocket.getOutputStream(), true);
+				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				try {
 					Log.d(TAG, "Connection was established");
 					out = new PrintWriter(clientSocket.getOutputStream(), true);
 					in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-					String line = in.readLine();
+					line = in.readLine();
 					if (line != null) {
 						Log.d(TAG, "Received: '" + line + "'");
 						if (line.trim().equals("{\"Command\":\"exit\",\"Params\":[]}")) {
@@ -82,43 +85,34 @@ public class TcpServer implements Runnable {
 						out.flush();
 					}
 
-					
-					
-				}  catch (Exception e) {
+				} catch (Exception e) {
 					Log.e(TAG, "Failed to process request due to" + e.getMessage());
-				} finally {
-					// Closing resources
-					if (null != out) {
-						out.close();
-					}
-					try {
-						if (null != in) {
-							in.close();
-						}
-						if (null != clientSocket) {
-							clientSocket.close();
-						}
-					} catch (Exception e) {
-						Log.w(TAG, "exception was caught while closing resources", e);
-					}
-				} 
-			} while (!done);
-		}
-		catch (IOException e){ 
-			Log.w(TAG, "exception was caught while handling server socket", e);
-		}
-		
-		finally {
-			if (null != serverSocket ){
-				try {
-					serverSocket.close();
-				} catch (IOException e) {
-					Log.w(TAG, "exception was caught while closing resources", e);
 				}
+			} while (!done);
+		} catch (IOException e) {
+			Log.w(TAG, "exception was caught while handling server socket", e);
+		} finally {
+			// Closing resources
+			try {
+				if (null != serverSocket) {
+					serverSocket.close();
+				}
+
+				if (null != out) {
+					out.close();
+				}
+
+				if (null != in) {
+					in.close();
+				}
+				if (null != clientSocket) {
+					clientSocket.close();
+				}
+			} catch (Exception e) {
+				Log.w(TAG, "exception was caught while closing resources", e);
 			}
 		}
 	}
-				
 
 	public void stop() {
 		done = true;

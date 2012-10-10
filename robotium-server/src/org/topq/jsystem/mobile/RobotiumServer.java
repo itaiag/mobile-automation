@@ -22,7 +22,7 @@ public class RobotiumServer extends ActivityInstrumentationTestCase2 implements 
 
 		try {
 			confUtil = ConfUtil.getInstance();
-			Log.i(TAG, "CLass name to launch is:" + confUtil.getConfigParameters("LAUNCHER_ACTIVITY_FULL_CLASSNAME"));
+			Log.i(TAG, "Class name to launch is:" + confUtil.getConfigParameters("LAUNCHER_ACTIVITY_FULL_CLASSNAME"));
 			launcherActivityClass = Class.forName(confUtil.getConfigParameters("LAUNCHER_ACTIVITY_FULL_CLASSNAME"));
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG, "Failed to load class " + e.getMessage());

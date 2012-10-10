@@ -54,7 +54,7 @@ public class USBDevice extends AbstractAndroidDevice {
 	 * @param pakageName
 	 * @param testClassName
 	 * @param testName
-	 * @throws Exception
+	 * @throws IOException,Exception
 	 */
 	public void runTestOnDevice(String pakageName, String testClassName, String testName) throws Exception {
 
@@ -72,12 +72,12 @@ public class USBDevice extends AbstractAndroidDevice {
 			Thread.sleep(TimeUnit.SECONDS.toMillis(2));
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 			String s;
-			String allBuffer = " ";
+			StringBuilder  allBuffer = new StringBuilder(); 
 			while ((s = stdInput.readLine()) != null) {
-				allBuffer += s;
-			}
-			if (allBuffer.contains("Exception")) {
-				Exception e = new Exception(allBuffer);
+				allBuffer.append(s);
+			} 
+			if(allBuffer.indexOf("Exception")!=-1){
+				Exception e = new Exception(allBuffer.toString());
 				logger.error(e);
 				throw e;
 			}

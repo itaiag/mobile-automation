@@ -61,9 +61,6 @@ public class ConfUtil {
 				confMap.put(line.split("=")[0].trim(), line.split("=")[1].trim());
 			}
 
-		} catch (IOException e) {
-			Log.e(TAG, "Failed to open " + CONFIG_FILE + " " + e.getMessage());
-			e.printStackTrace();
 		} finally {
 			if (null != in) {
 				in.close();

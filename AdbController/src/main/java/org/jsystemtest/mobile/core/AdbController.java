@@ -21,9 +21,7 @@ import com.android.ddmlib.IDevice;
  * Uses the AndroidDebugBridge object to support ADB operations.<br>
  * Holds the ADB TCP Clients.<br>
  * 
- * @see <a
- *      href="http://developer.android.com/guide/developing/tools/adb.html">ADB
- *      documentaion</a>
+ * @see <a href="http://developer.android.com/guide/developing/tools/adb.html">ADB documentaion</a>
  * @author topq
  * 
  */
@@ -37,14 +35,14 @@ public class AdbController implements IDeviceChangeListener {
 	private static AdbController instance;
 
 	private File adbLocation;
-	private long timeoutForDeviceConnection = 5000;
+	private long timeoutForDeviceConnection = 120000;
 	private Map<String, AbstractAndroidDevice> devices = new HashMap<String, AbstractAndroidDevice>();
 	private CommunicationBus communicationBus = CommunicationBus.USB;
 	private AndroidDebugBridge adb;
 
 	/**
-	 * Init the system object. Get all the connected devices (if exist), set
-	 * port forwarding & init the TCP connection
+	 * Initialize the system object. <br>
+	 * Get all the connected devices (if exist), set port forwarding & initialize the TCP connection<br>
 	 */
 	private AdbController() throws Exception {
 		adbLocation = findAdbFile();
@@ -67,7 +65,6 @@ public class AdbController implements IDeviceChangeListener {
 			}
 		}
 		return instance;
-
 	}
 
 	/**
@@ -110,8 +107,7 @@ public class AdbController implements IDeviceChangeListener {
 	}
 
 	/**
-	 * Search for the adb.exe in the folder that is specified in the
-	 * ANDROID_HOME environment variable
+	 * Search for the adb.exe in the folder that is specified in the ANDROID_HOME environment variable
 	 * 
 	 * @return
 	 */
@@ -123,7 +119,7 @@ public class AdbController implements IDeviceChangeListener {
 
 		final File root = new File(androidHome);
 		if (!root.exists()) {
-			throw new IOException("Android home: " + root.getAbsolutePath() + " is not exist");
+			throw new IOException("Android home: " + root.getAbsolutePath() + " does not exist");
 		}
 
 		try {
@@ -132,6 +128,7 @@ public class AdbController implements IDeviceChangeListener {
 			Collection<File> files = FileUtils.listFiles(root, extensions, recursive);
 			for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {
 				File file = (File) iterator.next();
+				// TODO: Eran - I think should be using equals as compareTo is more sortedDataStructure oriented.
 				if (file.getName().compareTo("adb.exe") == 0) {
 					return file.getParentFile();
 				}
@@ -160,8 +157,7 @@ public class AdbController implements IDeviceChangeListener {
 	}
 
 	/**
-	 * Wait for device with the given serial to be connect or until timeout is
-	 * reached. The default timeout is 5 seconds
+	 * Wait for device with the given serial to be connect or until timeout is reached. The default timeout is 5 seconds
 	 * 
 	 * @param serial
 	 * @return The device with the given serial
