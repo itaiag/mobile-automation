@@ -89,7 +89,7 @@ public class SoloExecutor {
 				result.put(RESULT_STRING, activateIntent(command.getArguments()));
 			}
 		}
-		Log.e(TAG,"The Result is:"+result);
+		Log.i(TAG,"The Result is:"+result);
 		return result;
 
 	}
@@ -326,9 +326,9 @@ public class SoloExecutor {
 	}
 
 	private String enterText(JSONArray params) {
-		String command = "the command  clickOnButton";
+		String command = "the command  enterText";
 		try {
-			command += "(" + params.getString(0) + ")";
+			command += "(" + params.getString(0) + ","+params.getString(1)+")";
 			solo.enterText(params.getInt(0), params.getString(1));
 		}  catch (Throwable e) {
 			return handleException(command, e);
@@ -376,7 +376,7 @@ public class SoloExecutor {
 	
 
 	private String handleException(final String command,Throwable e) {
-		String error =ERROR_STRING + command+" failed due to " + e.getStackTrace();
+		String error =ERROR_STRING + command+" failed due to " + e.getMessage();
 		Log.e(TAG,error);
 		return error;
 	}
