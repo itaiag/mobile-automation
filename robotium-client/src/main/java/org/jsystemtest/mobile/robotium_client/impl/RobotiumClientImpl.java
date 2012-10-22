@@ -37,6 +37,10 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	private static String deviceSerial;
 	private static String apkLocation = null;
 	private static String host = "localhost";
+	// ERAN ADDED BACK TO CLASS
+	private static String pakageName = null;
+	private static String testClassName = null;
+	private static String testName = null;
 
 	public RobotiumClientImpl(String configFileName) throws Exception {
 		this(configFileName, true);
@@ -46,12 +50,37 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		this(configFileName, deployServer, true);
 	}
 
-	public RobotiumClientImpl(Properties configProperties, boolean deployServer, boolean launchServer)
-			throws InstallException, Exception {
+	public RobotiumClientImpl(Properties configProperties, boolean deployServer, boolean launchServer) throws InstallException, Exception {
 		readConfigFile(configProperties);
 		launchClient();
 		launchServer(deployServer, launchServer, configProperties);
 	}
+
+	// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ERAN - changed imple to work on my station, will decide on a final
+	// public RobotiumClientImpl(String configFileName, boolean deployServer, boolean launchServer) throws Exception {
+	// final File configFile = new File(configFileName);
+	// if (!configFile.exists()) {
+	// throw new IOException("Configuration file was not found in " + configFileName);
+	// }
+	//
+	// Properties configProperties = new Properties();
+	// FileInputStream in = null;
+	// try {
+	// in = new FileInputStream(configFile);
+	// configProperties.load(in);
+	//
+	// } finally {
+	// if (in != null) {
+	// in.close();
+	// }
+	//
+	// }
+	//
+	// readConfigFile(configProperties);
+	// launchClient();
+	// launchServer(deployServer, launchServer, configProperties);
+	//
+	// }
 
 	public RobotiumClientImpl(String configFileName, boolean deployServer, boolean launchServer) throws Exception {
 		final File configFile = new File(configFileName);
@@ -66,16 +95,24 @@ public class RobotiumClientImpl implements MobileClintInterface {
 			configProperties.load(in);
 
 		} finally {
-			if (in != null){
-				in.close();
-			}
-			
+			in.close();
 		}
 
 		readConfigFile(configProperties);
-		launchClient();
-		launchServer(deployServer, launchServer, configProperties);
 
+		device = AdbController.getInstance().waitForDeviceToConnect(deviceSerial);
+		if (deployServer) {
+			device.installPackage(apkLocation, true);
+			// String serverConfFile = configProperties.getProperty("ServerConfFile");
+			// logger.debug("Server Conf File:" + serverConfFile);
+			// device.pushFileToDevice(CONFIG_FILE,serverConfFile);
+		}
+		if (launchServer) {
+			device.runTestOnDevice(pakageName, testClassName, testName);
+		}
+		logger.info("Start server on device");
+		setPortForwarding();
+		tcpClient = new TcpClient(host, port);
 	}
 
 	private void launchClient() throws ConnectionException, Exception {
@@ -84,8 +121,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		tcpClient = new TcpClient(host, port);
 	}
 
-	private void launchServer(boolean deployServer, boolean launchServer, Properties configProperties)
-			throws InstallException, Exception {
+	private void launchServer(boolean deployServer, boolean launchServer, Properties configProperties) throws InstallException, Exception {
 		if (deployServer) {
 			logger.info("About to deploy server on device");
 			device.installPackage(apkLocation, true);
@@ -99,39 +135,60 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		}
 	}
 
-	/**
-	 * Read all the details from the given properties and populate the object
-	 * members.
-	 * 
-	 * @param configProperties
-	 */
-	private void readConfigFile(final Properties configProperties) {
-		if (isPropertyExist(configProperties, "Port")) {
-			port = Integer.parseInt(configProperties.getProperty("Port"));
-		}
-		logger.debug("Port is set to" + port);
+	private void readConfigFile(Properties configProperties) {
+		port = Integer.parseInt(configProperties.getProperty("Port"));
+		logger.debug("In Properties file port is:" + port);
 
-		if (!isPropertyExist(configProperties, "DeviceSerail")) {
-			throw new IllegalStateException("Device serial is not specify in config file");
-		}
 		deviceSerial = configProperties.getProperty("DeviceSerail");
+		logger.debug("In Properties file device serial is:" + deviceSerial);
 
-		logger.debug("Device serial is set to" + deviceSerial);
+		apkLocation = configProperties.getProperty("ApkLocation");
+		logger.debug("APK location is:" + apkLocation);
 
-		if (isPropertyExist(configProperties, "ApkLocation")) {
-			apkLocation = configProperties.getProperty("ApkLocation");
-		}
-		logger.debug("APK location is set to:" + apkLocation);
+		pakageName = configProperties.getProperty("PakageName");
+		logger.debug("Pakage Name is:" + pakageName);
 
-		if (isPropertyExist(configProperties, "Host")) {
-			host = configProperties.getProperty("Host");
-		}
-		logger.debug("Host is set to" + host);
+		testClassName = configProperties.getProperty("TestClassName");
+		logger.debug("Test Class Name is:" + testClassName);
+
+		testName = configProperties.getProperty("TestName");
+		logger.debug("Test  Name is:" + testName);
+
+		host = configProperties.getProperty("Host");
+		logger.debug("Host  Name is:" + host);
 	}
 
+	// /**
+	// * Read all the details from the given properties and populate the object members.
+	// *
+	// * @param configProperties
+	// */
+	// private void readConfigFile(final Properties configProperties) {
+	// if (isPropertyExist(configProperties, "Port")) {
+	// port = Integer.parseInt(configProperties.getProperty("Port"));
+	// }
+	// logger.debug("Port is set to" + port);
+	//
+	// if (!isPropertyExist(configProperties, "DeviceSerail")) {
+	// throw new IllegalStateException("Device serial is not specify in config file");
+	// }
+	// deviceSerial = configProperties.getProperty("DeviceSerail");
+	//
+	// logger.debug("Device serial is set to" + deviceSerial);
+	//
+	// if (isPropertyExist(configProperties, "ApkLocation")) {
+	// apkLocation = configProperties.getProperty("ApkLocation");
+	// }
+	// logger.debug("APK location is set to:" + apkLocation);
+	//
+	// if (isPropertyExist(configProperties, "Host")) {
+	// host = configProperties.getProperty("Host");
+	// }
+	// logger.debug("Host is set to" + host);
+	// }
+
 	/**
-	 * Check if the property with the specified key exists in the specified
-	 * properties object.
+	 * Check if the property with the specified key exists in the specified properties object.
 	 * 
 	 * @param configProperties
 	 * @param key
@@ -143,8 +200,8 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	}
 
 	/**
-	 * Send data using the TCP connection & wait for response Parse the response
-	 * (make conversions if necessary - pixels to mms) and report
+	 * Send data using the TCP connection & wait for response Parse the response (make conversions if necessary - pixels
+	 * to mms) and report
 	 * 
 	 * @param device
 	 * @param data
@@ -226,7 +283,6 @@ public class RobotiumClientImpl implements MobileClintInterface {
 
 	public String clickOnView(int index) throws Exception {
 		return sendData("clickOnView", Integer.toString(index));
-
 	}
 
 	public String enterText(int index, String text) throws Exception {
@@ -268,14 +324,12 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	}
 
 	public String push(byte[] data, String newlocalFileName) throws Exception {
-		String result = sendData("createFileInServer", newlocalFileName, Base64.encodeBytes(data, Base64.URL_SAFE),
-				"true");
+		String result = sendData("createFileInServer", newlocalFileName, Base64.encodeBytes(data, Base64.URL_SAFE), "true");
 		return result;
 	}
 
 	public void closeConnection() throws Exception {
 		sendData("exit");
-
 	}
 
 	private void setPortForwarding() throws Exception {
@@ -289,15 +343,23 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	public void closeActivity() throws Exception {
 		sendData("closeActivity");
 	}
-	
-	public String clickInControlByIndex(String controlName, int indexToClickOn) throws Exception{
-		return sendData("clickInControlByIndex", controlName, Integer.toString(indexToClickOn));
-	}
-	
-	public String isViewVisible(String viewName) throws Exception{
+
+	public String isViewVisible(String viewName) throws Exception {
 		return sendData("isViewVisible", viewName);
 	}
-	
-	public void close(){
+
+	public void close() {
+	}
+
+	public String clickInControlByIndex(String controlName, int indexToClickOn) throws Exception {
+		return sendData("clickInControlByIndex", controlName, Integer.toString(indexToClickOn));
+	}
+
+	public String isViewVisibleByViewName(String viewName) throws Exception {
+		return sendData("isViewVisibleByViewName", viewName);
+	}
+
+	public String isViewVisibleByViewId(int viewId) throws Exception {
+		return sendData("isViewVisibleByViewId", String.valueOf(viewId));
 	}
 }

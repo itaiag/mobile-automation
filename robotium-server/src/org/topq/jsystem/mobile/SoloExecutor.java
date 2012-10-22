@@ -5,7 +5,6 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,26 +40,19 @@ public class SoloExecutor {
 		this.instrumentation = instrumentation;
 	}
 
-	public JSONObject execute(final String data) throws JSONException {
-		ScriptParser parser = null;
+	public JSONObject execute(final String data) throws Exception {
+		ScriptParser parser;
 		JSONObject result = new JSONObject();
-		try {
-			parser = new ScriptParser(data);
-		} catch (JSONException e) {
-			result.put(RESULT_STRING, handleException(" new ScriptParser(" + data + ")", e));
-			return result;
-
-		}
-		Log.d(TAG, data);
+		parser = new ScriptParser(data);
 		for (CommandParser command : parser.getCommands()) {
 			if (command.getCommand().equals("enterText")) {
 				result.put(RESULT_STRING, enterText(command.getArguments()));
-			} else if (command.getCommand().equals("getViewByName")) {
-				result.put(RESULT_STRING, getViewByName(command.getArguments()));
 			} else if (command.getCommand().equals("clickInControlByIndex")) {
 				result.put(RESULT_STRING, clickInControlByIndex(command.getArguments()));
-			} else if (command.getCommand().equals("isViewVisible")) {
-				result.put(RESULT_STRING, isViewVisible(command.getArguments()));
+			} else if (command.getCommand().equals("isViewVisibleByViewName")) {
+				result.put(RESULT_STRING, isViewVisibleByViewName(command.getArguments()));
+			} else if (command.getCommand().equals("isViewVisibleByViewId")) {
+				result.put(RESULT_STRING, isViewVisibleByViewId(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnButton")) {
 				result.put(RESULT_STRING, clickOnButton(command.getArguments()));
 			} else if (command.getCommand().equals("launch")) {
@@ -89,20 +81,63 @@ public class SoloExecutor {
 				result.put(RESULT_STRING, getCurrentTextViews(command.getArguments()));
 			} else if (command.getCommand().equals("clickOnHardware")) {
 				result.put(RESULT_STRING, clickOnHardware(command.getArguments()));
-
 			} else if (command.getCommand().equals("createFileInServer")) {
 				result.put(RESULT_STRING, createFileInServer(command.getArguments()));
 			} else if (command.getCommand().equals("pull")) {
 				return pull(command.getArguments());
-			} else if (command.getCommand().equals("activateIntent")) {
-				result.put(RESULT_STRING, activateIntent(command.getArguments()));
 			} else if (command.getCommand().equals("closeActivity")) {
 				result.put(RESULT_STRING, closeActivity());
+			} else if (command.getCommand().equals("activateIntent")) {
+				result.put(RESULT_STRING, activateIntent(command.getArguments()));
 			}
 		}
 		Log.e(TAG, "The Result is:" + result);
 		return result;
 
+	}
+
+	private String isViewVisibleByViewId(JSONArray arguments) {
+		String result;
+		String command = "the command isViewVisible";
+		try {
+			int viewId = arguments.getInt(0);
+			command += "(" + viewId + ")";
+			View view = solo.getView(viewId);
+			if (view != null) {
+				if (view.isShown()) {
+					result = SUCCESS_STRING + " view with ID: " + viewId + " is visible";
+				} else {
+					result = SUCCESS_STRING + " view with ID: " + viewId + " is not visible";
+				}
+			} else {
+				result = ERROR_STRING + " view with ID: " + viewId + " is not found ";
+			}
+		} catch (Throwable e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
+			return error;
+		}
+		return result;
+	}
+
+	private String isViewVisibleByViewName(JSONArray arguments) {
+		String result;
+		String command = "the command isViewVisible";
+		try {
+			String viewName = arguments.getString(0);
+			command += "(" + viewName + ")";
+			View view = findViewByName(viewName);
+			if (view.isShown()) {
+				result = SUCCESS_STRING + " view: " + viewName + " is visible";
+			} else {
+				result = SUCCESS_STRING + " view: " + viewName + " is not visible";
+			}
+		} catch (Throwable e) {
+			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
+			Log.d(TAG, error);
+			return error;
+		}
+		return result;
 	}
 
 	private String activateIntent(JSONArray arguments) {
@@ -273,15 +308,24 @@ public class SoloExecutor {
 		return SUCCESS_STRING + command;
 	}
 
-	private String clickInControlByIndex(JSONArray commandParameters) {
+	private String clickInControlByIndex(JSONArray commandParameters) throws Exception {
 		String command = "The command clickInControlByIndex";
 		try {
-			String controlName = commandParameters.getString(0);
+			int controlId = commandParameters.getInt(0);
 			int indexToClickOn = commandParameters.getInt(1);
-			command += "(controlName: " + controlName + ")";
+			command += "(controlId: " + controlId + ")";
 			command += "(indexToClickOn: " + indexToClickOn + ")";
-			View control = findViewByName(controlName);
-			clickOnView(control.getTouchables().get(indexToClickOn));
+			View control = solo.getView(controlId);
+			if (control != null) {
+				if (indexToClickOn < control.getTouchables().size()) {
+					clickOnView(control.getTouchables().get(indexToClickOn));
+				} else {
+					return ERROR_STRING + command + "failed due to: index to click in control is out of bounds. control touchables: "
+							+ control.getTouchables().size();
+				}
+			} else {
+				return ERROR_STRING + command + "failed due to failed to find control with id: " + controlId;
+			}
 		} catch (Throwable e) {
 			return handleException(command, e);
 		}
@@ -304,45 +348,6 @@ public class SoloExecutor {
 			}
 		}
 		throw new Exception("View : " + viewName + " was not found in current views ");
-	}
-
-	/**
-	 * TODO HANDLE VIEW AS RETURN PARAMETER --> need to complete this impl<br>
-	 * need to impl view to json consider using google gson object
-	 * 
-	 * @param arguments
-	 * @return
-	 * @throws Exception
-	 */
-	private String getViewByName(JSONArray arguments) {
-		String command = "the command getViewByName ";
-		try {
-			String viewName = arguments.getString(0);
-			findViewByName(viewName);
-		} catch (Throwable e) {
-			handleException(command, e);
-		}
-		return SUCCESS_STRING + command;
-	}
-
-	private String isViewVisible(JSONArray arguments) {
-		String result;
-		String command = "the command isViewVisible";
-		try {
-			String viewName = arguments.getString(0);
-			command += "(" + viewName + ")";
-			View view = findViewByName(viewName);
-			if (view.isShown()) {
-				result = SUCCESS_STRING + " view: " + viewName + " is visible";
-			} else {
-				result = SUCCESS_STRING + " view: " + viewName + " is not visible";
-			}
-		} catch (Throwable e) {
-			String error = ERROR_STRING + command + "failed due to " + e.getMessage();
-			Log.d(TAG, error);
-			return error;
-		}
-		return result;
 	}
 
 	/**
