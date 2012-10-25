@@ -23,31 +23,30 @@ import android.util.Log;
  */
 public class RobotiumServerInstrumentation extends Instrumentation implements IDataCallback, ISoloProvider {
 	
-	private static final long serialVersionUID = 1L;
 	private static final String TAG = "RobotiumServerInstrumentation";
-	private  Intent sintent;
-	private  Bundle mResults = new Bundle();
 	private Activity myActive = null;
 	private SoloExecutor executor = null;
 	private Thread serverThread;
 	private static boolean continueRunning = true;
 	private static String launcherActivityClass;
-	private static ConfUtil confUtil = null;
 	private Solo solo = null;
 	
 	@Override	public void onCreate(Bundle arguments) {	
 		Log.d(TAG, "onCreate");	
 		super.onCreate(arguments);
-		try{
-		confUtil = ConfUtil.getInstance();
-		Log.i(TAG, "CLass name to launch is:" + confUtil.getConfigParameters("LAUNCHER_ACTIVITY_FULL_CLASSNAME"));
-		launcherActivityClass =confUtil.getConfigParameters("LAUNCHER_ACTIVITY_FULL_CLASSNAME");
-	} catch (IOException e) {
-		Log.e(TAG, "Failed to find config file: " + e.getMessage());
-		System.exit(100);
-	}
-		start();
+		if ( arguments != null ) {
+			if ( arguments.containsKey ( "launcherActivityClass" ) ) {
+				launcherActivityClass= arguments.getString ( "launcherActivityClass" );
+				Log.d ( TAG, arguments.getString ( "launcherActivityClass" ) ); 
+			} else {
+				Log.e (TAG, "no launcherActivityClass here!" );
+				System.exit(100);
+
+			}
+
 		}
+		start();
+	}
 	@Override	public void onStart() {
 		startServer();
 	}
