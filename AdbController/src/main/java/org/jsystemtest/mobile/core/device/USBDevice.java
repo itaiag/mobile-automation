@@ -3,6 +3,8 @@ package org.jsystemtest.mobile.core.device;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -57,16 +59,32 @@ public class USBDevice extends AbstractAndroidDevice {
 	 * @throws IOException,Exception
 	 */
 	public void runTestOnDevice(String pakageName, String testClassName, String testName) throws Exception {
+		runAdbCommand("-e class " + pakageName + "." + testClassName + "#" + testName + " "
+				+ pakageName + "/android.test.InstrumentationTestRunner",null);
+	}
+	
+	public void  startServer(String pakageName,String launcherActivityClass) throws Exception{
+		Map<String, String> parms = new HashMap<String, String>();
+		parms.put("launcherActivityClass", launcherActivityClass);
+		runAdbCommand(pakageName + "/"+pakageName+".RobotiumServerInstrumentation",parms);
+		
+	}
 
+	private void runAdbCommand(String commandPrfix,Map<String,String> params) throws IOException, Exception {
 		if (null == adbLocation || !adbLocation.exists()) {
 			throw new IOException("Can't find adb location");
 		}
-		String cmd = adbLocation.getAbsolutePath() + "\\adb -s " + device.getSerialNumber()
-				+ " shell am instrument -e class " + pakageName + "." + testClassName + "#" + testName + " "
-				+ pakageName + "/android.test.InstrumentationTestRunner";
+		StringBuilder cmd = new StringBuilder(adbLocation.getAbsolutePath() + "\\adb -s " + device.getSerialNumber()+" shell am instrument ");
+		if(params != null){
+			cmd.append(" -e");
+			for(String name : params.keySet()){
+				cmd.append(" "+name+" "+params.get(name));
+			}
+		}
+		cmd.append(" "+commandPrfix);
 		logger.info("Try to run command:" + cmd);
 		Runtime run = Runtime.getRuntime();
-		Process pr = run.exec(cmd);
+		Process pr = run.exec(cmd.toString());
 		try {
 			pr.waitFor();
 			Thread.sleep(TimeUnit.SECONDS.toMillis(2));
@@ -76,15 +94,17 @@ public class USBDevice extends AbstractAndroidDevice {
 			while ((s = stdInput.readLine()) != null) {
 				allBuffer.append(s);
 			} 
-			if(allBuffer.indexOf("Exception")!=-1){
+			if(allBuffer.indexOf("Exception")!=-1 || allBuffer.indexOf("Error")!=-1){
 				Exception e = new Exception(allBuffer.toString());
 				logger.error(e);
 				throw e;
 			}
 
 		} catch (InterruptedException e) {
-			// Don't care
+			logger.error(e);
 		}
 	}
+
+
 
 }
