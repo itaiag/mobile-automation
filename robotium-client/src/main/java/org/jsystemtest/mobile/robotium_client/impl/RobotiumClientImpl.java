@@ -26,6 +26,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	private static int port = 6100;
 	private static String deviceSerial;
 	private static String apkLocation = null;
+	private static String launcherActivityFullClassname = null;
 	private static String pakageName = null;
 	private static String testClassName = null;
 	private static String host = null;
@@ -62,12 +63,9 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		device = AdbController.getInstance().waitForDeviceToConnect(deviceSerial);
 		if (deployServer) {
 			device.installPackage(apkLocation, true);
-			String serverConfFile = configProperties.getProperty("ServerConfFile");
-			logger.debug("Server Conf File:" + serverConfFile);
-			device.pushFileToDevice(CONFIG_FILE,serverConfFile);
 		}
 		if (launchServer) {
-			device.runTestOnDevice(pakageName, testClassName, testName);
+			device.startServer(pakageName, launcherActivityFullClassname);
 		}
 		logger.info("Start server on device");
 		setPortForwarding();
@@ -95,6 +93,9 @@ public class RobotiumClientImpl implements MobileClintInterface {
 
 		host = configProperties.getProperty("Host");
 		logger.debug("Host  Name is:" + host);
+		
+		launcherActivityFullClassname = configProperties.getProperty("launcherActivityFullClassname");
+		logger.debug("launcherActivityFullClassname  Name is:" + launcherActivityFullClassname);
 	}
 
 	/**
