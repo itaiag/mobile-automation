@@ -35,7 +35,7 @@ public class AdbController implements IDeviceChangeListener {
 	private static AdbController instance;
 
 	private File adbLocation;
-	private long timeoutForDeviceConnection = 120000;
+	private long timeoutForDeviceConnection = 180000;
 	private Map<String, AbstractAndroidDevice> devices = new HashMap<String, AbstractAndroidDevice>();
 	private CommunicationBus communicationBus = CommunicationBus.USB;
 	private AndroidDebugBridge adb;
@@ -48,11 +48,21 @@ public class AdbController implements IDeviceChangeListener {
 		adbLocation = findAdbFile();
 
 		// Init the AndroidDebugBridge object
-		AndroidDebugBridge.init(false);
+		try {
+			AndroidDebugBridge.init(false);
+		} catch (Exception e) {
+			if (e.getMessage().contains("AndroidDebugBridge.init() has already been called.")) {
+				;// ignore
+			} else {
+				throw e;
+			}
+		}
 		adb = AndroidDebugBridge.createBridge(adbLocation.getAbsolutePath() + File.separator + "adb", true);
+
 		if (adb == null) {
 			throw new IllegalStateException("Failed to create ADB bridge");
 		}
+
 		AndroidDebugBridge.addDeviceChangeListener(this);
 	}
 
@@ -177,7 +187,7 @@ public class AdbController implements IDeviceChangeListener {
 				// Not important
 			}
 		}
-		return (USBDevice)devices.get(serial);
+		return (USBDevice) devices.get(serial);
 	}
 
 	@Override

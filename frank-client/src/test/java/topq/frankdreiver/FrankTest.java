@@ -1,6 +1,6 @@
 package topq.frankdreiver;
 
-import org.jsystemtest.mobile.common_mobile.client.interfaces.MobileClintInterface;
+import org.jsystemtest.mobile.common_mobile.client.interfaces.MobileClientInterface;
 import org.jsystemtest.mobile.frank_client.imp.FrankClientImpl;
 import org.junit.Test;
 
@@ -10,7 +10,7 @@ import org.junit.Test;
  *
  */
 public class FrankTest {
-	MobileClintInterface frank = new FrankClientImpl("C:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\frank-client\\src\\resources\\test.properties");
+	MobileClientInterface frank = new FrankClientImpl("C:\\Users\\Vadim\\git\\mobile-automation\\new\\2\\frank-client\\src\\resources\\test.properties");
 
 
 	@Test

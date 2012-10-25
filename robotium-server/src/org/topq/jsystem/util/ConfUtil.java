@@ -23,51 +23,14 @@ public class ConfUtil {
 	private static final String TAG = "ConfUtil";
 	private static final String CONFIG_FILE = "/data/conf.txt";
 
-	// %%%%%%%%%%%%%%%%%%%%%%%%%%% PREVIOUS IMPL - DO NOT DELETE PLEASE -- ERAN !
-	// private ConfUtil() throws IOException {
-	//
-	// confMap = new HashMap<String, String>();
-	// InputStream in = null;
-	// try {
-	// // init all the configuration
-	// File config = new File("/data/conf.txt");
-	// if (config.exists()) {
-	// in = new FileInputStream(config);
-	//
-	// InputStreamReader input = new InputStreamReader(in);
-	// BufferedReader buffer = new BufferedReader(input);
-	// String line = " ";
-	//
-	// while ((line = buffer.readLine()) != null) {
-	// confMap.put(line.split("=")[0].trim(), line.split("=")[1].trim());
-	// }
-	//
-	// } else {
-	// confMap.put("LAUNCHER_ACTIVITY_FULL_CLASSNAME", "com.gettaxi.driverbox.activity.DriverIdentificationActivity");
-	// confMap.put("TARGET_PACKAGE_ID", "com.gettaxi");
-	// }
-	// } catch (IOException e) {
-	// Log.e(TAG, "Failed to open file:/data/conf.txt" + e.getMessage());
-	// e.printStackTrace();
-	// } finally {
-	// if (null != in) {
-	// in.close();
-	// }
-	// }
-	//
-	// }
-
 	/**
-	 * Search for config file from the following properties: <br>
+	 * Search for configuration file from the following properties: <br>
 	 * LAUNCHER_ACTIVITY_FULL_CLASSNAME <br>
 	 * TARGET_PACKAGE_ID <br>
 	 * <br>
 	 * For example: <br>
 	 * LAUNCHER_ACTIVITY_FULL_CLASSNAME = com.gettaxi.android.activities.login.LoadingActivity <br>
 	 * TARGET_PACKAGE_ID = com.gettaxi <br>
-	 * 
-	 * 
-	 * 
 	 * 
 	 * @throws IOException
 	 */

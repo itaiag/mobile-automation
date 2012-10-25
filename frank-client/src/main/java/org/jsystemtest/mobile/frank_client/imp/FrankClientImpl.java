@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jsystemtest.mobile.common_mobile.client.enums.HardwareButtons;
-import org.jsystemtest.mobile.common_mobile.client.interfaces.MobileClintInterface;
+import org.jsystemtest.mobile.common_mobile.client.interfaces.MobileClientInterface;
 import org.jsystemtest.mobile.frank_ssh.SshIosDevice;
 
 import com.dhemery.configuring.Configuration;
@@ -18,7 +18,7 @@ import com.dhemery.victor.Victor;
  * @author Bortman Limor
  * 
  */
-public class FrankClientImpl implements MobileClintInterface {
+public class FrankClientImpl implements MobileClientInterface {
 
 	private static IosApplication application;
 	private static IosDevice device = null;

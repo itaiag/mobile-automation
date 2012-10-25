@@ -20,6 +20,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.jayway.android.robotium.solo.Solo;
@@ -47,6 +48,8 @@ public class SoloExecutor {
 		for (CommandParser command : parser.getCommands()) {
 			if (command.getCommand().equals("enterText")) {
 				result.put(RESULT_STRING, enterText(command.getArguments()));
+			} else if (command.getCommand().equals("isButtonVisible")) {
+				result.put(RESULT_STRING, isButtonVisible(command.getArguments()));
 			} else if (command.getCommand().equals("clickInControlByIndex")) {
 				result.put(RESULT_STRING, clickInControlByIndex(command.getArguments()));
 			} else if (command.getCommand().equals("isViewVisibleByViewName")) {
@@ -393,6 +396,55 @@ public class SoloExecutor {
 			return handleException(command, e);
 		}
 		return SUCCESS_STRING + command;
+	}
+
+	private String isButtonVisible(JSONArray arguments) {
+		String command = "the command isButtonVisible ";
+		boolean isVisible = false;
+		String result;
+		try {
+			String searchButtonByKey = arguments.getString(0);
+			command += "(findButtonBy: " + arguments.getString(0) + ")";
+			if (searchButtonByKey.equalsIgnoreCase("text")) {
+				String searchButtonByTextValue = arguments.getString(1);
+				command += "(Value: " + searchButtonByTextValue + ")";
+				isVisible = isButtonVisibleByText(searchButtonByTextValue);
+			} else if (searchButtonByKey.equalsIgnoreCase("id")) {
+				int searchButtonByIntValue = arguments.getInt(1);
+				command += "(Value: " + searchButtonByIntValue + ")";
+				isVisible = isButtonVisibleById(searchButtonByIntValue);
+			}
+		} catch (Throwable e) {
+			return handleException(command, e);
+		}
+		if (isVisible) {
+			result = SUCCESS_STRING + command + " is visible";
+		} else {
+			result = SUCCESS_STRING + command + " is not visible";
+		}
+
+		return result;
+	}
+
+	private boolean isButtonVisibleByText(String buttonText) throws Exception {
+		Button button = solo.getButton(buttonText);
+		if (button != null) {
+			return button.isShown();
+		} else {
+			throw new Exception("Button with text: " + buttonText + " was not found");
+		}
+	}
+
+	private boolean isButtonVisibleById(int buttonId) throws Exception {
+		ArrayList<Button> currentButtons = solo.getCurrentButtons();
+		for (Button button : currentButtons) {
+			if (button.getId() == buttonId){
+				if (button.isShown()){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private String clickInList(JSONArray arguments) {

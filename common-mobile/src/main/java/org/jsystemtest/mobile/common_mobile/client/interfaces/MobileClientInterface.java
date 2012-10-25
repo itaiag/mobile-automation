@@ -9,7 +9,7 @@ import org.jsystemtest.mobile.common_mobile.client.enums.HardwareButtons;
  * @author Bortman Limor
  *
  */
-public interface MobileClintInterface {
+public interface MobileClientInterface {
 	
 	public static final CharSequence ERROR_STRING = "ERROR";
 	public static final CharSequence SUCCESS_STRING = "SUCCESS";
