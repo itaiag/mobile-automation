@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 public class RobotiumClientActivity extends Activity {
-	private static final String TAG = "RobotiumClientActivity";
+
 
 	/** Called when the activity is first created. */
 
