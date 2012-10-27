@@ -28,20 +28,28 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	private static String apkLocation = null;
 	private static String launcherActivityFullClassname = null;
 	private static String pakageName = null;
-	private static String testClassName = null;
 	private static String host = null;
-	private static String testName = null;
 	private static final String RESULT_STRING = "RESULT";
 	private static final String CONFIG_FILE = "/data/conf.txt";
 
 	public RobotiumClientImpl(String configFileName) throws Exception {
 		this(configFileName, true);
 	}
-
+/**
+ * @param configFileName
+ * @param deployServer
+ * @throws Exception
+ */
 	public RobotiumClientImpl(String configFileName, boolean deployServer) throws Exception {
 		this(configFileName, deployServer, true);
 	}
-
+/**
+ * @author Bortman Limor
+ * @param configFileName- the location of the client config file
+ * @param deployServer - will install the serverApk (if you olrady install it the old version will be delete and the new one will be installed)
+ * @param launchServer - start the server 
+ * @throws Exception
+ */
 	public RobotiumClientImpl(String configFileName, boolean deployServer, boolean launchServer) throws Exception {
 		final File configFile = new File(configFileName);
 		if (!configFile.exists()) {
@@ -72,31 +80,6 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		tcpClient = new TcpClient(host, port);
 	}
 
-	private void readConfigFile(Properties configProperties) {
-		port = Integer.parseInt(configProperties.getProperty("Port"));
-		logger.debug("In Properties file port is:" + port);
-
-		deviceSerial = configProperties.getProperty("DeviceSerail");
-		logger.debug("In Properties file device serial is:" + deviceSerial);
-
-		apkLocation = configProperties.getProperty("ApkLocation");
-		logger.debug("APK location is:" + apkLocation);
-
-		pakageName = configProperties.getProperty("PakageName");
-		logger.debug("Pakage Name is:" + pakageName);
-
-		testClassName = configProperties.getProperty("TestClassName");
-		logger.debug("Test Class Name is:" + testClassName);
-
-		testName = configProperties.getProperty("TestName");
-		logger.debug("Test  Name is:" + testName);
-
-		host = configProperties.getProperty("Host");
-		logger.debug("Host  Name is:" + host);
-		
-		launcherActivityFullClassname = configProperties.getProperty("launcherActivityFullClassname");
-		logger.debug("launcherActivityFullClassname  Name is:" + launcherActivityFullClassname);
-	}
 
 	/**
 	 * Send data using the TCP connection & wait for response Parse the response
@@ -133,7 +116,14 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		}
 		return resultValue;
 	}
-
+/**
+ * 
+@author Bortman Limor
+ * @param command
+ * @param params
+ * @return
+ * @throws Exception
+ */
 	public JSONObject sendDataAndGetJSonObj(String command, String... params) throws Exception {
 		JSONObject jsonobj = new JSONObject();
 		jsonobj.put("Command", command);
@@ -157,7 +147,7 @@ public class RobotiumClientImpl implements MobileClintInterface {
 	public String launch() throws Exception {
 		return sendData("launch");
 	}
-
+	
 	public String getTextView(int index) throws Exception {
 		return sendData("getTextView", Integer.toString(index));
 	}
@@ -232,13 +222,37 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		sendData("exit");
 
 	}
-
-	private void setPortForwarding() throws Exception {
-		device.setPortForwarding(port, GeneralEnums.SERVERPORT);
-	}
-
 	public AbstractAndroidDevice getDevice() throws Exception {
 		return device;
 	}
 
+
+	private void setPortForwarding() throws Exception {
+		device.setPortForwarding(port, GeneralEnums.SERVERPORT);
+	}
+	/**
+	 * 
+	@author Bortman Limor
+	 * @param configProperties
+	 */
+	private void readConfigFile(Properties configProperties) {
+		port = Integer.parseInt(configProperties.getProperty("Port"));
+		logger.debug("In Properties file port is:" + port);
+
+		deviceSerial = configProperties.getProperty("DeviceSerail");
+		logger.debug("In Properties file device serial is:" + deviceSerial);
+
+		apkLocation = configProperties.getProperty("ApkLocation");
+		logger.debug("APK location is:" + apkLocation);
+
+		pakageName = configProperties.getProperty("PakageName");
+		logger.debug("Pakage Name is:" + pakageName);
+
+		host = configProperties.getProperty("Host");
+		logger.debug("Host  Name is:" + host);
+		
+		launcherActivityFullClassname = configProperties.getProperty("launcherActivityFullClassname");
+		logger.debug("launcherActivityFullClassname  Name is:" + launcherActivityFullClassname);
+	}
+	
 }
