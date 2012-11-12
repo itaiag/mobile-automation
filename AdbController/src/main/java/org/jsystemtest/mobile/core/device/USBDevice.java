@@ -1,6 +1,7 @@
 package org.jsystemtest.mobile.core.device;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +62,7 @@ public class USBDevice extends AbstractAndroidDevice {
 		if (null == adbLocation || !adbLocation.exists()) {
 			throw new IOException("Can't find adb location");
 		}
-		String cmd = adbLocation.getAbsolutePath() + "\\adb -s " + device.getSerialNumber()
+		String cmd = adbLocation.getAbsolutePath() + File.separator + "adb -s " + device.getSerialNumber()
 				+ " shell am instrument -e class " + pakageName + "." + testClassName + "#" + testName + " "
 				+ pakageName + "/android.test.InstrumentationTestRunner";
 		logger.info("Try to run command:" + cmd);

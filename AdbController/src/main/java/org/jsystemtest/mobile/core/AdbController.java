@@ -132,14 +132,13 @@ public class AdbController implements IDeviceChangeListener {
 			throw new IOException("Android home: " + root.getAbsolutePath() + " does not exist");
 		}
 
-		try {
-			String[] extensions = { "exe" };
+		try {			
 			boolean recursive = true;
-			Collection<File> files = FileUtils.listFiles(root, extensions, recursive);
+			Collection<File> files = FileUtils.listFiles(root, null, recursive);
 			for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {
 				File file = (File) iterator.next();
 				// TODO: Eran - I think should be using equals as compareTo is more sortedDataStructure oriented.
-				if (file.getName().compareTo("adb.exe") == 0) {
+				if (file.getName().equals("adb") || file.getName().equals("adb.exe")) {
 					return file.getParentFile();
 				}
 			}
