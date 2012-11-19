@@ -124,19 +124,21 @@ public class RobotiumClientImpl implements MobileClintInterface {
  * @return
  * @throws Exception
  */
+	@SuppressWarnings("unused")
 	public JSONObject sendDataAndGetJSonObj(String command, String... params) throws Exception {
 		JSONObject jsonobj = new JSONObject();
 		jsonobj.put("Command", command);
 		jsonobj.put("Params", params);
 		logger.info("Sending command: " + jsonobj.toString());
-		JSONObject result = null;
+		JSONObject result;
 		logger.info("Send Data to " + device.getSerialNumber());
 
 		try {
-			if(tcpClient.sendData(jsonobj)==null){
+			result = new JSONObject(tcpClient.sendData(jsonobj));
+			//this @SuppressWarnings is for this line. if here result==null) that mens that we didn't get data from the server
+			if(result==null){
 				throw new Exception("No data recvied from server! pleas check server log!");
 			}
-			result = new JSONObject(tcpClient.sendData(jsonobj));
 		} catch (Exception e) {
 			logger.error("Failed to send / receive data", e);
 			throw e;
@@ -144,8 +146,8 @@ public class RobotiumClientImpl implements MobileClintInterface {
 		return result;
 	}
 
-	public String launch() throws Exception {
-		return sendData("launch");
+	public String launch(String launcherActivityClass) throws Exception {
+		return sendData("launch",launcherActivityClass);
 	}
 	
 	public String getTextView(int index) throws Exception {
