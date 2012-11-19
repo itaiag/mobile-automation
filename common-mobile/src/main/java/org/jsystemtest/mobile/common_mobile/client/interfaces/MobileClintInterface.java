@@ -16,7 +16,7 @@ public interface MobileClintInterface {
 	public static final String NO_DATA_STRING = "NO_DATA_FROM_SERVER";
 
 	
-	public String launch() throws Exception;
+	public String launch(String launcherActivityClass) throws Exception;
 	
 	public String getTextView(int index) throws Exception ;
 	
