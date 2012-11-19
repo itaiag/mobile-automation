@@ -9,10 +9,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
+
 import android.app.Activity;
+import android.content.ComponentName;
+import android.os.Bundle;
 import android.util.Log;
 
 /**
@@ -34,10 +38,10 @@ public class TcpServer implements Runnable {
 
 	private boolean done = false;
 	
-//	private final Activity act;
+	private final Activity act;
 
-	public TcpServer() {
-		listeners = new ArrayList<IDataCallback>();
+	public TcpServer(Activity act) {
+		this.act= act;
 	}
 
 	public void addTestListener(IDataCallback toAdd) {
@@ -66,30 +70,44 @@ public class TcpServer implements Runnable {
 				Log.d(TAG, "Server is waiting for connection");
 				clientSocket = serverSocket.accept();
 				
-				
 				PrintWriter clientOut = null;
 				BufferedReader clientIn = null;
+				PrintWriter serverOutput = null;
+				BufferedReader serverInput = null;
 				try {
 					Log.d(TAG, "Connection was established");
 					clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
 					clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 					String line = clientIn.readLine();
-					PrintWriter serverOutput = null;
-					BufferedReader serverInput = null;
-					Socket socket = new Socket("localhost", 4321);
-					socket.setTcpNoDelay(true);
 					if (line != null) {
-						
+						ScriptParser parser = new ScriptParser(line);
+						for (CommandParser command : parser.getCommands()) {
+							if(command.getCommand().equals("launch")){
+								Bundle savedInstanceState = new Bundle();
+								savedInstanceState.putString("launcherActivityClass", command.getArguments().getString(0));
+								act.startInstrumentation(new ComponentName("org.topq.jsystem.mobile", "org.topq.jsystem.mobile.RobotiumServerInstrumentation"), null, savedInstanceState);
+							}
+						}
+						Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+						Socket socket = new Socket("localhost", 4321);
+						socket.setTcpNoDelay(true);
 						Log.d(TAG, "Received: '" + line + "'");
-						serverOutput = new PrintWriter(socket.getOutputStream());
-						serverInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-						serverOutput.append(line+"\n");
+						if(serverOutput == null){
+							serverOutput = new PrintWriter(socket.getOutputStream());
+						}
+						if(serverInput == null){
+							serverInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+						}
+						serverOutput.println(line+"\n");
 						serverOutput.flush();
 						
 					}
-				
-					clientOut.println(serverInput.readLine());
 					
+					clientOut.println( serverInput.readLine());
+					clientOut.flush();
+					clientSocket.close();
+				
+
 				}  catch (Exception e) {
 					Log.e(TAG, "Failed to process request due to" + e.getMessage());
 				} finally {
@@ -104,6 +122,13 @@ public class TcpServer implements Runnable {
 						if (null != clientSocket) {
 							clientSocket.close();
 						}
+						if (null != serverOutput) {
+							serverOutput.close();
+						}
+						if (null != serverInput) {
+							serverInput.close();
+						}
+						
 					} catch (Exception e) {
 						Log.w(TAG, "exception was caught while closing resources", e);
 					}

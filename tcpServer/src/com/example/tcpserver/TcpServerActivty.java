@@ -3,7 +3,7 @@ package com.example.tcpserver;
 import org.json.JSONObject;
 
 
-import com.example.tcpserver.IDataCallback;
+
 
 
 import android.os.Bundle;
@@ -29,10 +29,12 @@ public class TcpServerActivty extends Activity {
     	if(savedInstanceState == null){
     		savedInstanceState = new Bundle();
     	}
-    	savedInstanceState.putString("launcherActivityClass", "com.gettaxi.android.activities.login.LoadingActivity");
-		startInstrumentation(new ComponentName("org.topq.jsystem.mobile", "org.topq.jsystem.mobile.RobotiumServerInstrumentation"), null, savedInstanceState);
+//    	savedInstanceState.putString("launcherActivityClass", "com.gettaxi.android.activities.login.LoadingActivity");
+//		startInstrumentation(new ComponentName("org.topq.jsystem.mobile", "org.topq.jsystem.mobile.RobotiumServerInstrumentation"), null, savedInstanceState);
 		startServer();
     }
+	
+	
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -41,13 +43,13 @@ public class TcpServerActivty extends Activity {
     }
     public void startServer()  {	
 		Log.d(TAG, "Start server");	
-		TcpServer server = new TcpServer();
+		TcpServer server = new TcpServer(this);
 		Log.i(TAG, "About to launch server");
 		serverThread = new Thread(server);
 		serverThread.start();
 		Log.i(TAG, "Server is up");
 		try {
-			finish();
+//			finish();
 		while (continueRunning && server.isRunning()) {
 				Thread.sleep(1000);
 		}
